@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: zimbra_mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: crm_zimbra
+    ports:
+      # Puerto 3307 en el host para evitar conflicto con servicios locales en 3306
+      - "3307:3306"
+    volumes:
+      # Ejecuta automáticamente 01_crear_tablas.sql y 02_insertar_datos.sql al iniciar por primera vez
+      - ./DB:/docker-entrypoint-initdb.d:ro
+      - zimbra_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  zimbra_mysql_data:
+    driver: local
