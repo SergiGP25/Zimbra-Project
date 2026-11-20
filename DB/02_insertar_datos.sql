@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Proyecto : Sistema transaccional de prospectos, marketing y ventas
 --            (Caso Zimbra) - Materia: Sistemas Transaccionales
--- Script   : 02_insertar_datos.sql  (datos de prueba)
+-- Script   : 02_insertar_datos.sql  (datos simulados, mínimo 30 por tabla)
 -- Requisito: haber ejecutado antes 01_crear_tablas.sql
 --
 -- Datos: 30 empleados, 30 campanas, 30 productos, 60 prospectos, mas
@@ -17,6 +17,9 @@
 -- Fecha de referencia de los datos: 2026-11-04.
 -- Los puntajes y estados de los prospectos siguen las reglas RN-04 y RN-05.
 -- =====================================================================
+
+-- Lee este archivo como UTF-8 (sin esto, las tildes y la ñ se guardan dañadas)
+SET NAMES utf8mb4;
 
 USE crm_zimbra;
 SET FOREIGN_KEY_CHECKS = 1;
@@ -397,58 +400,59 @@ INSERT INTO visita_web (visita_id, prospecto_id, fecha_hora, pagina_visitada, du
     (209, 60, '2026-06-22 11:48:51', '/', 179);
 
 -- DESCARGA_PRUEBA: 51 registros
-INSERT INTO descarga_prueba (descarga_id, prospecto_id, producto_id, fecha_inicio, fecha_fin, estado) VALUES
-    (1, 2, 2, '2026-06-08', '2026-08-07', 'Convertida'),
-    (2, 3, 2, '2026-05-29', '2026-07-28', 'Convertida'),
-    (3, 4, 5, '2026-05-27', '2026-07-26', 'Convertida'),
-    (4, 5, 7, '2026-06-08', '2026-08-07', 'Convertida'),
-    (5, 6, 5, '2026-09-10', '2026-11-09', 'Activa'),
-    (6, 7, 4, '2026-06-29', '2026-08-28', 'Convertida'),
-    (7, 8, 3, '2026-03-16', '2026-05-15', 'Vencida'),
-    (8, 9, 6, '2026-02-02', '2026-04-03', 'Convertida'),
-    (9, 10, 2, '2026-06-20', '2026-08-19', 'Convertida'),
-    (10, 11, 5, '2026-04-16', '2026-06-15', 'Convertida'),
-    (11, 12, 6, '2026-10-22', '2026-12-21', 'Activa'),
-    (12, 13, 2, '2026-02-04', '2026-04-05', 'Convertida'),
-    (13, 14, 2, '2026-02-07', '2026-04-08', 'Convertida'),
-    (14, 15, 5, '2026-04-25', '2026-06-24', 'Convertida'),
-    (15, 16, 4, '2026-09-29', '2026-11-28', 'Activa'),
-    (16, 17, 3, '2026-05-29', '2026-07-28', 'Convertida'),
-    (17, 19, 1, '2026-09-07', '2026-11-06', 'Activa'),
-    (18, 20, 5, '2026-09-28', '2026-11-27', 'Activa'),
-    (19, 21, 7, '2026-10-14', '2026-12-13', 'Activa'),
-    (20, 22, 3, '2026-04-20', '2026-06-19', 'Convertida'),
-    (21, 23, 6, '2026-05-18', '2026-07-17', 'Convertida'),
-    (22, 24, 4, '2026-05-25', '2026-07-24', 'Convertida'),
-    (23, 25, 1, '2026-04-01', '2026-05-31', 'Convertida'),
-    (24, 26, 7, '2026-05-09', '2026-07-08', 'Vencida'),
-    (25, 27, 1, '2026-09-27', '2026-11-26', 'Activa'),
-    (26, 28, 2, '2026-06-26', '2026-08-25', 'Convertida'),
-    (27, 29, 4, '2026-09-26', '2026-11-25', 'Activa'),
-    (28, 30, 3, '2026-05-03', '2026-07-02', 'Convertida'),
-    (29, 32, 5, '2026-05-17', '2026-07-16', 'Convertida'),
-    (30, 33, 3, '2026-02-06', '2026-04-07', 'Convertida'),
-    (31, 34, 7, '2026-04-22', '2026-06-21', 'Convertida'),
-    (32, 35, 4, '2026-06-27', '2026-08-26', 'Vencida'),
-    (33, 36, 7, '2026-10-17', '2026-12-16', 'Activa'),
-    (34, 38, 7, '2026-09-10', '2026-11-09', 'Activa'),
-    (35, 39, 3, '2026-09-15', '2026-11-14', 'Activa'),
-    (36, 40, 5, '2026-07-09', '2026-09-07', 'Convertida'),
-    (37, 41, 4, '2026-07-03', '2026-09-01', 'Convertida'),
-    (38, 42, 4, '2026-09-20', '2026-11-19', 'Activa'),
-    (39, 45, 2, '2026-09-25', '2026-11-24', 'Activa'),
-    (40, 46, 3, '2026-10-02', '2026-12-01', 'Activa'),
-    (41, 48, 3, '2026-07-11', '2026-09-09', 'Convertida'),
-    (42, 49, 3, '2026-09-19', '2026-11-18', 'Activa'),
-    (43, 50, 1, '2026-09-20', '2026-11-19', 'Activa'),
-    (44, 51, 5, '2026-09-15', '2026-11-14', 'Activa'),
-    (45, 52, 4, '2026-03-21', '2026-05-20', 'Convertida'),
-    (46, 53, 1, '2026-05-02', '2026-07-01', 'Convertida'),
-    (47, 54, 3, '2026-04-18', '2026-06-17', 'Convertida'),
-    (48, 55, 3, '2026-02-05', '2026-04-06', 'Convertida'),
-    (49, 57, 3, '2026-04-21', '2026-06-20', 'Convertida'),
-    (50, 58, 4, '2026-10-08', '2026-12-07', 'Activa'),
-    (51, 60, 1, '2026-05-03', '2026-07-02', 'Convertida');
+-- fecha_fin no se inserta: es una columna generada (fecha_inicio + 60 días)
+INSERT INTO descarga_prueba (descarga_id, prospecto_id, producto_id, fecha_inicio, estado) VALUES
+    (1, 2, 2, '2026-06-08', 'Convertida'),
+    (2, 3, 2, '2026-05-29', 'Convertida'),
+    (3, 4, 5, '2026-05-27', 'Convertida'),
+    (4, 5, 7, '2026-06-08', 'Convertida'),
+    (5, 6, 5, '2026-09-10', 'Activa'),
+    (6, 7, 4, '2026-06-29', 'Convertida'),
+    (7, 8, 3, '2026-03-16', 'Vencida'),
+    (8, 9, 6, '2026-02-02', 'Convertida'),
+    (9, 10, 2, '2026-06-20', 'Convertida'),
+    (10, 11, 5, '2026-04-16', 'Convertida'),
+    (11, 12, 6, '2026-10-22', 'Activa'),
+    (12, 13, 2, '2026-02-04', 'Convertida'),
+    (13, 14, 2, '2026-02-07', 'Convertida'),
+    (14, 15, 5, '2026-04-25', 'Convertida'),
+    (15, 16, 4, '2026-09-29', 'Activa'),
+    (16, 17, 3, '2026-05-29', 'Convertida'),
+    (17, 19, 1, '2026-09-07', 'Activa'),
+    (18, 20, 5, '2026-09-28', 'Activa'),
+    (19, 21, 7, '2026-10-14', 'Activa'),
+    (20, 22, 3, '2026-04-20', 'Convertida'),
+    (21, 23, 6, '2026-05-18', 'Convertida'),
+    (22, 24, 4, '2026-05-25', 'Convertida'),
+    (23, 25, 1, '2026-04-01', 'Convertida'),
+    (24, 26, 7, '2026-05-09', 'Vencida'),
+    (25, 27, 1, '2026-09-27', 'Activa'),
+    (26, 28, 2, '2026-06-26', 'Convertida'),
+    (27, 29, 4, '2026-09-26', 'Activa'),
+    (28, 30, 3, '2026-05-03', 'Convertida'),
+    (29, 32, 5, '2026-05-17', 'Convertida'),
+    (30, 33, 3, '2026-02-06', 'Convertida'),
+    (31, 34, 7, '2026-04-22', 'Convertida'),
+    (32, 35, 4, '2026-06-27', 'Vencida'),
+    (33, 36, 7, '2026-10-17', 'Activa'),
+    (34, 38, 7, '2026-09-10', 'Activa'),
+    (35, 39, 3, '2026-09-15', 'Activa'),
+    (36, 40, 5, '2026-07-09', 'Convertida'),
+    (37, 41, 4, '2026-07-03', 'Convertida'),
+    (38, 42, 4, '2026-09-20', 'Activa'),
+    (39, 45, 2, '2026-09-25', 'Activa'),
+    (40, 46, 3, '2026-10-02', 'Activa'),
+    (41, 48, 3, '2026-07-11', 'Convertida'),
+    (42, 49, 3, '2026-09-19', 'Activa'),
+    (43, 50, 1, '2026-09-20', 'Activa'),
+    (44, 51, 5, '2026-09-15', 'Activa'),
+    (45, 52, 4, '2026-03-21', 'Convertida'),
+    (46, 53, 1, '2026-05-02', 'Convertida'),
+    (47, 54, 3, '2026-04-18', 'Convertida'),
+    (48, 55, 3, '2026-02-05', 'Convertida'),
+    (49, 57, 3, '2026-04-21', 'Convertida'),
+    (50, 58, 4, '2026-10-08', 'Activa'),
+    (51, 60, 1, '2026-05-03', 'Convertida');
 
 -- INTERACCION: 83 registros
 INSERT INTO interaccion (interaccion_id, prospecto_id, empleado_id, campana_id, tipo, fecha_hora, resultado, notas) VALUES
@@ -657,5 +661,14 @@ INSERT INTO venta (venta_id, propuesta_id, fecha_venta, monto_final, forma_pago,
     (28, 28, '2026-02-28', 1650.00, 'Tarjeta', 'Pagada'),
     (29, 29, '2026-05-27', 250.00, 'Tarjeta', 'Pagada'),
     (30, 30, '2026-06-10', 2250.00, 'Factura', 'Pagada');
+
+-- HISTORIAL_ESTADO: estado inicial de cada prospecto, propuesta y venta
+-- (los cambios posteriores los registran los triggers del script 05)
+INSERT INTO historial_estado (entidad, registro_id, estado_anterior, estado_nuevo, fecha_cambio, usuario_bd)
+SELECT 'Prospecto', prospecto_id, NULL, estado, '2026-11-04 08:00:00', 'carga_inicial' FROM prospecto
+UNION ALL
+SELECT 'Propuesta', propuesta_id, NULL, estado, '2026-11-04 08:00:00', 'carga_inicial' FROM propuesta
+UNION ALL
+SELECT 'Venta', venta_id, NULL, estado, '2026-11-04 08:00:00', 'carga_inicial' FROM venta;
 
 COMMIT;
