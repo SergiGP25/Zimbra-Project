@@ -42,9 +42,9 @@ services:
     depends_on:
       - backend
     ports:
-      - "5173:5173"
+      - "5174:5173"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
 
 volumes:
   zimbra_mysql_data:
