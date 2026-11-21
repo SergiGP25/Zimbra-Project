@@ -137,3 +137,10 @@ El usuario administrador se encuentra creado directamente en la base de datos My
 - **HU-02 — Cerrar sesión y expiración (RF-02):** Botón visible en el `Navbar`. Detector de inactividad que expira la sesión a los 30 minutos continuos sin eventos del usuario y redirige al login.
 - **HU-03 — Gestionar empleados (RF-03):** Módulo exclusivo para `Admin`. Creación, edición, listado con filtros y soft delete (`activo = FALSE`). **Regla crítica:** El sistema bloquea con HTTP 400 cualquier intento de desactivar o cambiar el rol del último Administrador activo.
 - **HU-04 — Control de acceso por rol (RF-04, RN-12):** Menú lateral dinámico según rol, rechazo de accesos no autorizados con **HTTP 403 Forbidden**. El rol `Vendedor` únicamente ve sus prospectos asignados (`empleado_id`), mientras que `Marketing` y `Admin` tienen visibilidad global.
+
+---
+
+## Documentación del Proyecto
+
+- [Requerimientos funcionales y reglas de negocio](REQUIREMENTS.md)
+- [Backlog priorizado de la siguiente entrega](BACKLOG.md)
