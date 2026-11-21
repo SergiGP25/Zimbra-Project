@@ -15,19 +15,17 @@ const MainApp: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth()
   const [currentTab, setCurrentTab] = useState<string>('dashboard')
 
-  // HU-02: Activar temporizador de inactividad de 30 minutos
   useInactivityTimer()
 
   if (isLoading) {
     return (
       <div className="loading-full-page">
         <div className="spinner"></div>
-        <p>Cargando sesión transaccional...</p>
+        <p>Preparando tu espacio de trabajo...</p>
       </div>
     )
   }
 
-  // HU-01: Si no está autenticado, renderizar Login
   if (!isAuthenticated) {
     return <LoginPage />
   }

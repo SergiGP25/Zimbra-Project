@@ -10,7 +10,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
   const { user } = useAuth()
   const role = user?.rol || ''
 
-  // HU-04: Menú dinámico que muestra solo las opciones permitidas según el rol
   const canManageEmployees = role.toLowerCase() === 'admin'
   const isVendedor = role.toLowerCase() === 'vendedor'
   const canViewVentas = isVendedor || role.toLowerCase() === 'admin'
@@ -18,39 +17,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
   return (
     <aside className="sidebar">
       <div className="sidebar-section">
-        <span className="sidebar-heading">Módulos</span>
+        <span className="sidebar-heading">Inicio</span>
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${currentTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => onTabChange('dashboard')}
           >
-            📊 Panel Principal
+            Panel
           </button>
+        </nav>
+      </div>
 
-          {/* Opción Prospectos: Visible para todos, pero con etiqueta diferenciada */}
+      <div className="sidebar-section">
+        <span className="sidebar-heading">Gestión comercial</span>
+        <nav className="sidebar-nav">
           <button
             className={`nav-item ${currentTab === 'prospectos' ? 'active' : ''}`}
             onClick={() => onTabChange('prospectos')}
           >
-            🎯 {isVendedor ? 'Mis Prospectos (Asignados)' : 'Prospectos (Global)'}
+            {isVendedor ? 'Mis prospectos' : 'Prospectos'}
           </button>
 
-          {/* HU-04: Gestión de Empleados visible EXCLUSIVAMENTE para Admin */}
           {canManageEmployees && (
             <button
               className={`nav-item ${currentTab === 'empleados' ? 'active' : ''}`}
               onClick={() => onTabChange('empleados')}
             >
-              👥 Gestión Empleados (Admin)
+              Empleados
             </button>
           )}
+        </nav>
+      </div>
 
+      {(isVendedor || canViewVentas) && (
+        <div className="sidebar-section">
+          <span className="sidebar-heading">Ventas</span>
+          <nav className="sidebar-nav">
           {isVendedor && (
             <button
               className={`nav-item ${currentTab === 'interacciones' ? 'active' : ''}`}
               onClick={() => onTabChange('interacciones')}
             >
-              ☎️ Interacciones
+              Interacciones
             </button>
           )}
 
@@ -59,23 +67,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               className={`nav-item ${currentTab === 'ventas' ? 'active' : ''}`}
               onClick={() => onTabChange('ventas')}
             >
-              💰 Ventas
+              Ventas
             </button>
           )}
-        </nav>
-      </div>
-
-      <div className="sidebar-role-info">
-        <span className="sidebar-heading">Rol Activo</span>
-        <div className="role-card">
-          <strong>{user?.rol}</strong>
-          <p className="role-description">
-            {role.toLowerCase() === 'admin' && 'Acceso total y administración de usuarios (HU-03).'}
-            {role.toLowerCase() === 'marketing' && 'Visibilidad global de prospectos y campañas.'}
-            {role.toLowerCase() === 'vendedor' && 'Visibilidad restringida a sus prospectos asignados (RN-12).'}
-          </p>
+          </nav>
         </div>
-      </div>
+      )}
+
     </aside>
   )
 }

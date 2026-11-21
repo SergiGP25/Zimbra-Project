@@ -3,7 +3,7 @@ import { Empleado, RolType } from '../../types/empleados/empleadoTypes'
 
 interface EmpleadoModalProps {
   isOpen: boolean
-  empleado: Empleado | null // null para crear, objeto para editar
+  empleado: Empleado | null
   onClose: () => void
   onSave: (data: {
     nombre: string
@@ -72,7 +72,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     <div className="modal-backdrop">
       <div className="modal-card">
         <div className="modal-header">
-          <h3>{empleado ? 'Editar Empleado (HU-03)' : 'Nuevo Empleado (HU-03)'}</h3>
+          <h3>{empleado ? 'Editar empleado' : 'Nuevo empleado'}</h3>
           <button className="btn-close" onClick={onClose} disabled={saving}>
             ✕
           </button>
@@ -98,7 +98,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label>Correo Electrónico (Único):</label>
+            <label>Correo electrónico:</label>
             <input
               type="email"
               className="input"
@@ -124,7 +124,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label>Rol Asignado (Limitado a Vendedor, Marketing o Admin):</label>
+            <label>Rol:</label>
             <select
               className="input"
               value={rol}
@@ -165,4 +165,3 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     </div>
   )
 }
-

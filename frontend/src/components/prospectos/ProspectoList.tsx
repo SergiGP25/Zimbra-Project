@@ -6,7 +6,6 @@ import { useAuth } from '../../hooks/auth/useAuth'
 export const ProspectoList: React.FC = () => {
   const { user } = useAuth()
   const [prospectos, setProspectos] = useState<Prospecto[]>([])
-  const [mensajeFiltro, setMensajeFiltro] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -16,7 +15,6 @@ export const ProspectoList: React.FC = () => {
     try {
       const res = await prospectoService.listProspectos()
       setProspectos(res.prospectos)
-      setMensajeFiltro(res.mensaje_filtro)
     } catch (err: any) {
       setError(err.detail || err.message || 'Error al obtener los prospectos')
     } finally {
@@ -29,24 +27,20 @@ export const ProspectoList: React.FC = () => {
   }, [])
 
   return (
-    <div className="card prospectos-container">
+    <div className="prospectos-container">
       <div className="card-header-actions">
         <div>
-          <h2>Listado de Prospectos (HU-04 · RN-12)</h2>
+          <h2>Prospectos</h2>
           <p className="text-muted">
-            Control de visibilidad según rol: Los vendedores solo ven prospectos asignados a su ID.
+            {user?.rol?.toLowerCase() === 'vendedor'
+              ? 'Consulta y organiza los prospectos asignados a tu equipo.'
+              : 'Consulta y gestiona los prospectos de tu organización.'}
           </p>
         </div>
         <button className="btn btn-secondary btn-sm" onClick={fetchProspectos}>
-          🔄 Actualizar
+          Actualizar
         </button>
       </div>
-
-      {mensajeFiltro && (
-        <div className="alert alert-info">
-          <strong>ℹ️ Regla RN-12 Activa:</strong> {mensajeFiltro}
-        </div>
-      )}
 
       {error && (
         <div className="alert alert-error">
@@ -58,7 +52,7 @@ export const ProspectoList: React.FC = () => {
         <div className="loading-state">Cargando prospectos...</div>
       ) : prospectos.length === 0 ? (
         <div className="empty-state">
-          No hay prospectos disponibles para tu usuario ({user?.rol}).
+          No hay prospectos disponibles por ahora.
         </div>
       ) : (
         <div className="table-wrapper">
@@ -81,7 +75,7 @@ export const ProspectoList: React.FC = () => {
                   <td><strong>#{p.id}</strong></td>
                   <td><strong>{p.nombre}</strong></td>
                   <td>{p.empresa || <span className="text-muted">—</span>}</td>
-                  <td><code>{p.email}</code></td>
+                  <td>{p.email}</td>
                   <td>{p.telefono || <span className="text-muted">—</span>}</td>
                   <td>
                     <span className="badge badge-outline">{p.estado}</span>
@@ -91,7 +85,7 @@ export const ProspectoList: React.FC = () => {
                   </td>
                   <td>
                     {p.vendedor_nombre ? (
-                      <span className="vendedor-tag">👤 {p.vendedor_nombre}</span>
+                      <span className="vendedor-tag">{p.vendedor_nombre}</span>
                     ) : (
                       <span className="text-muted text-xs">Sin asignar</span>
                     )}
@@ -105,4 +99,3 @@ export const ProspectoList: React.FC = () => {
     </div>
   )
 }
-

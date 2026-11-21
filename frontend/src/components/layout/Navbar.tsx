@@ -7,10 +7,10 @@ export const Navbar: React.FC = () => {
   return (
     <header className="navbar">
       <div className="navbar-brand">
-        <span className="brand-logo">⚡</span>
+        <span className="brand-logo" aria-hidden="true">✉</span>
         <div>
           <div className="brand-title">Zimbra CRM</div>
-          <div className="brand-subtitle">Sistemas Transaccionales · EP-01</div>
+          <div className="brand-subtitle">Prospectos y ventas</div>
         </div>
       </div>
 
@@ -24,14 +24,13 @@ export const Navbar: React.FC = () => {
             <span className={`role-badge role-${user.rol.toLowerCase()}`}>
               {user.rol}
             </span>
-            {/* HU-02: Botón de cerrar sesión visible */}
             <button
               id="btn-logout"
               className="btn btn-secondary btn-sm"
               onClick={() => logout()}
               title="Cerrar sesión actual"
             >
-              Cerrar Sesión
+              Cerrar sesión
             </button>
           </div>
         )}
@@ -39,4 +38,3 @@ export const Navbar: React.FC = () => {
     </header>
   )
 }
-

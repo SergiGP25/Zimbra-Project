@@ -27,7 +27,7 @@ export const LoginForm: React.FC = () => {
     <div className="login-card">
       <div className="login-header">
         <h2>Iniciar Sesión</h2>
-        <p className="text-muted">Accede al Sistema Transaccional Zimbra</p>
+        <p className="text-muted">Inicia sesión para continuar a tu espacio de trabajo.</p>
       </div>
 
       {sessionExpiredMessage && (
