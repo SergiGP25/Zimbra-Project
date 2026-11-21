@@ -69,6 +69,7 @@ docker compose up -d
 - **Puerto expuesto en el host:** **`3307`** (para evitar colisiones con instancias locales en `3306`).
 - **Base de datos:** `crm_zimbra`.
 - **Usuario:** `root` | **Contraseña:** *(sin contraseña)*.
+- **Frontend en Docker Compose:** [http://localhost:5174](http://localhost:5174) (el contenedor escucha en el puerto `5173`).
 
 Verificar estado del contenedor:
 ```bash
