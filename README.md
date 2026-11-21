@@ -141,7 +141,7 @@ El usuario administrador se encuentra creado directamente en la base de datos My
 
 | Campo | Valor |
 | :--- | :--- |
-| **Correo Electrónico** | `admin@zimbra.com` |
+| **Correo Electrónico** | `camila.rojas1@zimbra-demo.com` |
 | **Contraseña** | `Zimbra2026*` |
 | **Rol** | `Admin` |
 

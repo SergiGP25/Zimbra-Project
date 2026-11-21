@@ -115,7 +115,7 @@ class VentaRepository:
                 JOIN producto prd ON prd.producto_id = p.producto_id
                 LEFT JOIN venta v ON v.propuesta_id = p.propuesta_id
                 WHERE p.estado = 'Aceptada' AND v.venta_id IS NULL
-                ORDER BY p.fecha_emision DESC, p.propuesta_id DESC
+                ORDER BY p.propuesta_id DESC
                 """
             )
         ).mappings().all()
