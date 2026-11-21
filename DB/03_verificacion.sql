@@ -2,6 +2,9 @@
 -- Script   : 03_verificacion.sql  (comprobaciones despues de cargar datos)
 -- Uso      : ejecutar despues de 01 y 02. No modifica datos.
 -- =====================================================================
+-- Lee este archivo como UTF-8 (sin esto, las tildes y la ñ se guardan dañadas)
+SET NAMES utf8mb4;
+
 USE crm_zimbra;
 
 -- 1. Cantidad de registros por tabla (todas deben ser 30 o mas)
@@ -14,7 +17,8 @@ UNION ALL SELECT 'descarga_prueba', COUNT(*) FROM descarga_prueba
 UNION ALL SELECT 'interaccion', COUNT(*) FROM interaccion
 UNION ALL SELECT 'alerta', COUNT(*) FROM alerta
 UNION ALL SELECT 'propuesta', COUNT(*) FROM propuesta
-UNION ALL SELECT 'venta', COUNT(*) FROM venta;
+UNION ALL SELECT 'venta', COUNT(*) FROM venta
+UNION ALL SELECT 'historial_estado', COUNT(*) FROM historial_estado;
 
 -- 2. Prospectos por estado (embudo)
 SELECT estado, COUNT(*) AS total FROM prospecto GROUP BY estado ORDER BY total DESC;
@@ -61,3 +65,15 @@ FROM alerta a JOIN prospecto pr ON pr.prospecto_id = a.prospecto_id
 WHERE a.atendida = FALSE
 ORDER BY a.fecha_hora DESC
 LIMIT 10;
+
+-- 10. Columnas generadas: fecha_fin siempre es inicio + 60 días (debe dar 0)
+SELECT COUNT(*) AS pruebas_mal_calculadas
+FROM descarga_prueba
+WHERE fecha_fin <> fecha_inicio + INTERVAL 60 DAY;
+
+-- 11. Días restantes calculados al consultar (no se guardan)
+SELECT descarga_id, prospecto_id, fecha_fin,
+       DATEDIFF(fecha_fin, CURRENT_DATE) AS dias_restantes
+FROM descarga_prueba
+WHERE estado = 'Activa'
+ORDER BY dias_restantes;
