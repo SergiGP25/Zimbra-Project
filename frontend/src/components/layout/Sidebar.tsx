@@ -13,6 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
   // HU-04: Menú dinámico que muestra solo las opciones permitidas según el rol
   const canManageEmployees = role.toLowerCase() === 'admin'
   const isVendedor = role.toLowerCase() === 'vendedor'
+  const canViewVentas = isVendedor || role.toLowerCase() === 'admin'
 
   return (
     <aside className="sidebar">
@@ -43,6 +44,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               👥 Gestión Empleados (Admin)
             </button>
           )}
+
+          {isVendedor && (
+            <button
+              className={`nav-item ${currentTab === 'interacciones' ? 'active' : ''}`}
+              onClick={() => onTabChange('interacciones')}
+            >
+              ☎️ Interacciones
+            </button>
+          )}
+
+          {canViewVentas && (
+            <button
+              className={`nav-item ${currentTab === 'ventas' ? 'active' : ''}`}
+              onClick={() => onTabChange('ventas')}
+            >
+              💰 Ventas
+            </button>
+          )}
         </nav>
       </div>
 
@@ -60,4 +79,3 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
     </aside>
   )
 }
-

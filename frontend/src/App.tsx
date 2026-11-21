@@ -8,6 +8,8 @@ import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { EmpleadosPage } from './pages/EmpleadosPage'
 import { ProspectosPage } from './pages/ProspectosPage'
+import { InteraccionesPage } from './pages/InteraccionesPage'
+import { VentasPage } from './pages/VentasPage'
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth()
@@ -39,6 +41,8 @@ const MainApp: React.FC = () => {
           {currentTab === 'dashboard' && <DashboardPage onNavigate={setCurrentTab} />}
           {currentTab === 'prospectos' && <ProspectosPage />}
           {currentTab === 'empleados' && <EmpleadosPage />}
+          {currentTab === 'interacciones' && <InteraccionesPage />}
+          {currentTab === 'ventas' && <VentasPage />}
         </main>
       </div>
     </div>
