@@ -57,6 +57,22 @@ Zimbra-Project/
 
 ## ⚡ Guía de Despliegue y Ejecución
 
+### Variables de entorno
+
+Crea los archivos de entorno antes del arranque:
+
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+- `.env`: configuración usada por Docker Compose para el backend dentro de la red de contenedores.
+- `backend/.env`: configuración para ejecutar el backend localmente; usa `DB_HOST=localhost` y `DB_PORT=3307`.
+- `frontend/.env`: URL pública de la API.
+
+Para Docker, el `.env` de la raíz ya configura `DB_HOST=db` y `DB_PORT=3306`. No debe apuntar a `localhost`, porque el backend se ejecuta dentro de su propio contenedor.
+
 ### 1. Levantar la Base de Datos con Docker Compose
 
 En la raíz del proyecto:
