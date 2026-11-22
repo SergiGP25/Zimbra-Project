@@ -12,9 +12,21 @@ Sistema transaccional de prospectos, marketing y ventas construido con arquitect
 ```text
 Zimbra-Project/
 ├── DB/                               # Scripts SQL de base de datos
-│   ├── 01_crear_tablas.sql           # Esquema crm_zimbra, restricciones CHECK y procedimientos
-│   ├── 02_insertar_datos.sql         # Datos y semillas de prueba (30 empleados, prospectos, etc.)
-│   └── 03_verificacion.sql           # Consultas de auditoría e integridad
+│   ├── 01_crear_tablas.sql           # 11 tablas, restricciones, columnas generadas e índices
+│   ├── 02_insertar_datos.sql         # Datos simulados (30+ registros por tabla)
+│   ├── 03_verificacion.sql           # Consultas de auditoría e integridad
+│   ├── 04_create_admin_user.sql      # Usuario MySQL del taller (eliminar en producción)
+│   ├── 05_triggers.sql               # 8 triggers (TR-01 a TR-08)
+│   ├── 06_transacciones.sql          # T1 a T5, SAVEPOINT, vencimiento de pruebas
+│   ├── 07_reportes.sql               # Reportes R-01 a R-06
+│   ├── 08_vistas.sql                 # 8 vistas para reportes simplificados
+│   ├── 09_indices.sql                # 10 índices adicionales
+│   ├── 10_roles_permisos.sql         # Roles y usuarios de MySQL (mínimo privilegio)
+│   ├── 11_datos_demo.sql             # Datos demo relativos a la fecha de hoy (idempotente)
+│   ├── aplicar_datos_demo.ps1/.sh    # Aplica los datos demo sobre una base ya creada
+│   ├── reiniciar_demo.ps1            # Borra y recrea la base lista para la demo
+│   ├── pruebas/                      # 08 a 12 (ACID, carga, EXPLAIN, concurrencia, permisos); no se ejecutan solos
+│   └── respaldo/                     # respaldo y restauración (RNF-13)
 ├── docker-compose.yml                # Contenedor MySQL 8.0 en puerto 3307
 │
 ├── backend/                          # Backend (FastAPI + Python)
@@ -156,7 +168,20 @@ El usuario administrador se encuentra creado directamente en la base de datos My
 
 ---
 
+## Pruebas
+
+```bash
+cd backend && pip install -r requirements-dev.txt && pytest -v     # API (HU-43/44)
+docker compose exec backend python scripts/probar_api.py          # recorrido completo
+```
+SQL: `DB/pruebas/08` (ACID), `09` (carga 10 000), `10` (EXPLAIN), `11` (concurrencia, 2 terminales), `12` (permisos).
+Concurrencia contra la API: `docker compose exec backend python scripts/simular_concurrencia.py`.
+Respaldo: `.\DBespaldoespaldo.ps1` y `restaurar.ps1` (o los `.sh`).
+
 ## Documentación del Proyecto
 
 - [Requerimientos funcionales y reglas de negocio](REQUIREMENTS.md)
 - [Backlog priorizado de la siguiente entrega](BACKLOG.md)
+- [Manual de usuario](docs/MANUAL_USUARIO.md) · [Guion de demostración](docs/GUION_DEMOSTRACION.md) · [Alineación con el informe](docs/ALINEACION_ENTREGAS.md)
+- Sesión 4: [Informe final en inglés (APA)](docs/Final_Report_Zimbra_CRM.docx) · [Sustentación oral de 13 min](docs/ORAL_PRESENTATION_13MIN.md)
+- [Datos listos para probar](docs/DATOS_DEMO.md)

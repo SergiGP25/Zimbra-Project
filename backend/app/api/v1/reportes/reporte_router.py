@@ -45,3 +45,13 @@ def embudo(vendedor_id: Optional[int] = None, usuario: Dict = Depends(get_curren
 @router.get("/tasa-cierre", summary="R-06: tasa de cierre frente a la meta del caso (RF-44)")
 def tasa_cierre(desde: Optional[date] = None, hasta: Optional[date] = None, _u=gerencia, db: Optional[Session] = Depends(get_db)):
     return reporte_service.tasa_cierre(db, desde, hasta)
+
+
+@router.get("/vistas", summary="Vistas SQL disponibles para reportes simplificados (Sesión 4)")
+def vistas(_u=gerencia):
+    return reporte_service.vistas()
+
+
+@router.get("/vistas/{nombre}", summary="Consulta una vista de 08_vistas.sql")
+def vista(nombre: str, limite: int = Query(200, ge=1, le=1000), _u=gerencia, db: Optional[Session] = Depends(get_db)):
+    return reporte_service.vista(db, nombre, limite)

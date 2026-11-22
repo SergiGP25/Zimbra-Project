@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Any, Dict, Optional
 from fastapi import HTTPException, status
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.db_utils import es_vendedor, exigir_db, llamar_reporte
@@ -14,6 +15,20 @@ def _rango(desde: Optional[date], hasta: Optional[date]):
     if hasta < desde:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "La fecha final es anterior a la inicial")
     return desde, hasta
+
+
+# Vistas de 08_vistas.sql que se pueden consultar desde la API (lista blanca:
+# el nombre nunca se concatena a partir de lo que escribe el usuario).
+VISTAS = {
+    "v_embudo": "Prospectos por estado",
+    "v_ventas_por_mes": "Ventas por mes",
+    "v_ranking_vendedores": "Ranking de vendedores",
+    "v_rendimiento_campana": "Rendimiento por campaña",
+    "v_ventas_detalle": "Detalle de ventas",
+    "v_prospecto_resumen": "Resumen de prospectos",
+    "v_pruebas_activas": "Pruebas activas",
+    "v_alertas_pendientes": "Alertas pendientes",
+}
 
 
 class ReporteService:
@@ -42,6 +57,16 @@ class ReporteService:
     def tasa_cierre(self, db: Optional[Session], desde, hasta):
         desde, hasta = _rango(desde, hasta)
         return llamar_reporte(exigir_db(db), "sp_reporte_tasa_cierre", [desde, hasta])[0][0]
+
+    def vistas(self) -> Dict[str, str]:
+        return VISTAS
+
+    def vista(self, db: Optional[Session], nombre: str, limite: int):
+        if nombre not in VISTAS:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Vista no encontrada")
+        filas = exigir_db(db).execute(text(f"SELECT * FROM {nombre} LIMIT :n"), {"n": limite}).mappings().all()
+        # Decimal y fechas se convierten a tipos que FastAPI pueda serializar
+        return [{k: (float(v) if hasattr(v, "as_tuple") else v) for k, v in f.items()} for f in filas]
 
     def panel(self, db: Optional[Session], usuario: Dict[str, Any]) -> Dict[str, Any]:
         vendedor = usuario["id"] if es_vendedor(usuario) else None

@@ -104,7 +104,7 @@ export const FormularioProspecto: React.FC<BaseProps & { catalogos: Catalogos; p
 
 /** RF-08: solo ofrece las transiciones que el backend permite (RN-10). */
 export const CambiarEstado: React.FC<BaseProps & { prospecto: Prospecto }> = ({ prospecto, onClose, onGuardado }) => {
-  const [estado, setEstado] = useState(prospecto.transiciones_permitidas[0] || '')
+  const [estado, setEstado] = useState<string>(prospecto.transiciones_permitidas[0] || '')
   const [error, setError] = useState<string | null>(null)
 
   const enviar = async (e: React.FormEvent) => {
