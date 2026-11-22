@@ -15,6 +15,7 @@ const PESTANAS = [
   { id: 'conversion', texto: 'Conversión' },
   { id: 'campanas', texto: 'Campañas' },
   { id: 'cierre', texto: 'Tasa de cierre' },
+  { id: 'vistas', texto: 'Vistas SQL' },
 ] as const
 type Pestana = typeof PESTANAS[number]['id']
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -62,6 +63,7 @@ export const ReportesPage: React.FC<{ params: Record<string, string> }> = () => 
       {pestana === 'conversion' && <Conversion desde={desde} hasta={hasta} />}
       {pestana === 'campanas' && <Campanas desde={desde} hasta={hasta} />}
       {pestana === 'cierre' && <TasaCierre desde={desde} hasta={hasta} />}
+      {pestana === 'vistas' && <VistasSql />}
     </div>
   )
 }
@@ -79,6 +81,7 @@ const VentasMensual: React.FC<{ anio: number; mes: number }> = ({ anio, mes }) =
         <Indicador etiqueta="Pagadas" valor={Number(t.pagadas ?? 0)} />
         <Indicador etiqueta="Pendientes de pago" valor={Number(t.pendientes ?? 0)} />
       </div>
+      <GraficoBarras titulo="Monto vendido por vendedor" filas={datos.detalle.map((d) => ({ etiqueta: String(d.vendedor), valor: Number(d.monto_total) }))} formato={formatoMoneda} />
       <TablaReporte titulo={`Ventas por vendedor, ${MESES[mes - 1].toLowerCase()} de ${anio}`} archivo={`ventas-${anio}-${mes}`} filas={datos.detalle}
         columnas={[['vendedor', 'Vendedor'], ['num_ventas', 'Ventas'], ['monto_total', 'Monto', 'moneda'], ['ticket_promedio', 'Ticket promedio', 'moneda'], ['pct_del_mes', '% del mes', 'pct']]}
         vacio="No hubo ventas en ese mes. Prueba con junio de 2026, que tiene datos de ejemplo." />
@@ -126,6 +129,9 @@ const Conversion: React.FC<{ desde: string; hasta: string }> = ({ desde, hasta }
         <Indicador etiqueta="Activas / vencidas" valor={`${Number(datos.pruebas_activas ?? 0)} / ${Number(datos.pruebas_vencidas ?? 0)}`} />
       </div>
       {embudo.datos && (
+        <GraficoBarras titulo="Embudo actual de prospectos" filas={embudo.datos.map((e) => ({ etiqueta: String(e.estado), valor: Number(e.prospectos) }))} formato={(n) => String(n)} />
+      )}
+      {embudo.datos && (
         <TablaReporte titulo="Embudo actual de prospectos" archivo="embudo" filas={embudo.datos}
           columnas={[['estado', 'Estado'], ['prospectos', 'Prospectos'], ['pct_total', '% del total', 'pct']]} vacio="" />
       )}
@@ -138,9 +144,12 @@ const Campanas: React.FC<{ desde: string; hasta: string }> = ({ desde, hasta }) 
   if (cargando) return <Cargando />
   if (error || !datos) return <ErrorCarga mensaje={error || 'Sin datos'} onReintentar={recargar} />
   return (
+    <>
+    <GraficoBarras titulo="Monto vendido por campaña (las 10 mejores)" filas={[...datos].sort((a, b) => Number(b.monto_vendido) - Number(a.monto_vendido)).slice(0, 10).map((c) => ({ etiqueta: String(c.nombre), valor: Number(c.monto_vendido) }))} formato={formatoMoneda} />
     <TablaReporte titulo="Rendimiento por campaña" archivo="campanas" filas={datos}
       columnas={[['nombre', 'Campaña'], ['canal', 'Canal'], ['presupuesto', 'Presupuesto', 'moneda'], ['prospectos', 'Prospectos'], ['pruebas', 'Pruebas'], ['ventas', 'Ventas'], ['monto_vendido', 'Vendido', 'moneda'], ['costo_por_venta', 'Costo por venta', 'moneda']]}
       vacio="No hay campañas en ese rango." />
+    </>
   )
 }
 
@@ -193,5 +202,47 @@ const TablaReporte: React.FC<{ titulo: string; archivo: string; filas: Record<st
         </div>
       )}
     </section>
+  )
+}
+
+/* Gráfico de barras horizontales hecho con CSS: el ancho es el porcentaje del valor más alto. */
+const GraficoBarras: React.FC<{ titulo: string; filas: { etiqueta: string; valor: number }[]; formato: (n: number) => string }> = ({ titulo, filas, formato }) => {
+  if (!filas.length) return null
+  const max = Math.max(1, ...filas.map((f) => f.valor))
+  return (
+    <section className="card">
+      <h3 className="card-title">{titulo}</h3>
+      <div className="hbars" role="img" aria-label={titulo}>
+        {filas.map((f) => (
+          <div key={f.etiqueta} className="hbar-row">
+            <span className="hbar-label" title={f.etiqueta}>{f.etiqueta}</span>
+            <span className="hbar-track"><span className="hbar-fill" style={{ width: `${(f.valor / max) * 100}%` }} /></span>
+            <span className="hbar-value">{formato(f.valor)}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* Reportes simplificados: cada opción es una vista de 08_vistas.sql (SELECT * FROM v_...). */
+const VistasSql: React.FC = () => {
+  const lista = useCarga(() => reporteService.vistas(), [])
+  const [nombre, setNombre] = useState('v_ranking_vendedores')
+  const { datos, cargando, error, recargar } = useCarga(() => reporteService.vista(nombre), [nombre])
+  const filas = datos || []
+  const columnas: Columna[] = filas.length ? Object.keys(filas[0]).map((k) => [k, k.replace(/_/g, ' ')] as Columna) : []
+  return (
+    <>
+      <div className="filter-bar">
+        <label className="filter-group">Vista
+          <select className="input select-filter" value={nombre} onChange={(e) => setNombre(e.target.value)}>
+            {Object.entries(lista.datos || { [nombre]: nombre }).map(([k, t]) => <option key={k} value={k}>{t} ({k})</option>)}
+          </select></label>
+      </div>
+      {cargando ? <Cargando /> : error ? <ErrorCarga mensaje={error} onReintentar={recargar} /> : (
+        <TablaReporte titulo={`SELECT * FROM ${nombre}`} archivo={nombre} filas={filas} columnas={columnas} vacio="La vista no devolvió filas." />
+      )}
+    </>
   )
 }

@@ -83,4 +83,6 @@ export const reporteService = {
   campanas: (p: Params) => request<Record<string, any>[]>(`/reportes/campanas${query(p)}`),
   embudo: (vendedor_id?: number) => request<Record<string, any>[]>(`/reportes/embudo${query({ vendedor_id })}`),
   tasaCierre: (p: Params) => request<Record<string, any>>(`/reportes/tasa-cierre${query(p)}`),
+  vistas: () => request<Record<string, string>>('/reportes/vistas'),
+  vista: (nombre: string, limite = 200) => request<Record<string, any>[]>(`/reportes/vistas/${nombre}?limite=${limite}`),
 }

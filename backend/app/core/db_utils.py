@@ -92,6 +92,7 @@ def respuesta_error_mysql(error: Exception) -> Tuple[int, str]:
       3819 CHECK violado                                            -> 409
       1062 UNIQUE duplicado                                         -> 409
       1451/1452 llave foránea                                       -> 409
+      1205/1213 espera de bloqueo o interbloqueo (reintentar)         -> 409
       2003/2006/2013 sin conexión                                   -> 503
     El detalle técnico se registra en el log; el usuario ve un mensaje claro.
     """
@@ -112,6 +113,8 @@ def respuesta_error_mysql(error: Exception) -> Tuple[int, str]:
         return status.HTTP_409_CONFLICT, "Ya existe un registro con ese valor único."
     if codigo in (1451, 1452):
         return status.HTTP_409_CONFLICT, "El registro está relacionado con otros datos y no se puede modificar así."
+    if codigo in (1205, 1213):
+        return status.HTTP_409_CONFLICT, "Otro usuario está modificando estos datos. Intenta de nuevo en unos segundos."
     if codigo in (2003, 2006, 2013):
         return status.HTTP_503_SERVICE_UNAVAILABLE, "La base de datos no está disponible."
     return status.HTTP_500_INTERNAL_SERVER_ERROR, "Ocurrió un error en la base de datos."
