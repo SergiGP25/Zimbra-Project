@@ -14,3 +14,9 @@ export interface LoginResponse {
   message: string
 }
 
+
+export interface CambioPassword {
+  password_actual: string
+  password_nueva: string
+  confirmacion: string
+}

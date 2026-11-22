@@ -56,7 +56,7 @@ export const EmpleadoList: React.FC = () => {
 
   const handleDeactivate = async (emp: Empleado) => {
     const confirm = window.confirm(
-      `¿Quieres desactivar a "${emp.nombre}" (${emp.email})? El registro se conservará en el historial.`
+      `¿Estás seguro de desactivar a "${emp.nombre}" (${emp.email})?\n\nNota: Esto realiza un soft-delete (activo = FALSE) sin borrar el registro.`
     )
     if (!confirm) return
 
@@ -93,13 +93,13 @@ export const EmpleadoList: React.FC = () => {
     <div className="card empleados-container">
       <div className="card-header-actions">
         <div>
-          <h2>Empleados</h2>
+          <h2>Gestión de Empleados (HU-03)</h2>
           <p className="text-muted">
-            Administra las cuentas, los roles y el acceso de tu equipo.
+            Control de usuarios con roles (Admin, Marketing, Vendedor) y regla de protección del último Administrador.
           </p>
         </div>
         <button className="btn btn-primary" onClick={handleOpenCreate}>
-          Nuevo empleado
+          ➕ Nuevo Empleado
         </button>
       </div>
 
@@ -109,6 +109,7 @@ export const EmpleadoList: React.FC = () => {
         </div>
       )}
 
+      {/* Barra de Filtros */}
       <div className="filter-bar">
         <form onSubmit={handleSearchSubmit} className="search-form">
           <input
@@ -151,10 +152,11 @@ export const EmpleadoList: React.FC = () => {
         </div>
 
         <button className="btn btn-secondary btn-sm" onClick={fetchEmpleados}>
-          Actualizar
+          🔄 Refrescar
         </button>
       </div>
 
+      {/* Tabla de Empleados */}
       {loading ? (
         <div className="loading-state">Cargando lista de empleados...</div>
       ) : empleados.length === 0 ? (
@@ -200,9 +202,9 @@ export const EmpleadoList: React.FC = () => {
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => handleDeactivate(emp)}
-                        title="Desactivar empleado"
+                        title="Desactivar (Soft delete)"
                       >
-                        Desactivar
+                        🚫 Desactivar
                       </button>
                     ) : (
                       <span className="text-muted text-xs">Desactivado</span>
@@ -215,6 +217,7 @@ export const EmpleadoList: React.FC = () => {
         </div>
       )}
 
+      {/* Modal para Crear / Editar */}
       <EmpleadoModal
         isOpen={isModalOpen}
         empleado={selectedEmpleado}
@@ -224,3 +227,4 @@ export const EmpleadoList: React.FC = () => {
     </div>
   )
 }
+

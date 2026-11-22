@@ -1,65 +1,34 @@
-from typing import Dict, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.exc import SQLAlchemyError
+from datetime import date
+from typing import Dict, Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, require_roles
 from app.core.database import get_db
-from app.schemas.ventas.venta_schema import (
-    VentaCreate,
-    VentaResponse,
-    VentaListResponse,
-    PropuestaAceptadaResponse,
-)
+from app.schemas.ventas.venta_schema import VentaCreate
 from app.services.ventas.venta_service import venta_service
 
 router = APIRouter()
 
 
-def _database_error(exc: Exception) -> HTTPException:
-    detail = str(getattr(exc, "orig", exc))
-    if " - " in detail:
-        detail = detail.rsplit(" - ", 1)[-1].strip()
-    return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail or "Error de base de datos.")
-
-
-@router.get("/propuestas-aceptadas", response_model=List[PropuestaAceptadaResponse])
-def list_accepted_proposals(
-    current_user: Dict[str, object] = Depends(require_roles(["Vendedor", "Admin"])),
+@router.get("/", summary="Consultar ventas por fecha, vendedor y estado de pago (RF-38)")
+def listar(
+    desde: Optional[date] = None,
+    hasta: Optional[date] = None,
+    vendedor_id: Optional[int] = None,
+    estado: Optional[str] = Query(None, pattern="^(Pendiente|Pagada)$"),
+    usuario: Dict = Depends(get_current_user),
     db: Optional[Session] = Depends(get_db),
 ):
-    return venta_service.accepted_proposals(db=db)
+    return venta_service.listar(db, usuario, desde, hasta, vendedor_id, estado)
 
 
-@router.post(
-    "/",
-    response_model=VentaResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-def create_venta(
-    payload: VentaCreate,
-    current_user: Dict[str, object] = Depends(require_roles(["Vendedor", "Admin"])),
-    db: Optional[Session] = Depends(get_db),
-):
-    try:
-        return venta_service.create(payload=payload, db=db)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
-    except SQLAlchemyError as exc:
-        raise _database_error(exc)
+@router.post("/", status_code=201, summary="Registrar venta (RF-36, RF-37, transacción T4)")
+def registrar(datos: VentaCreate, usuario: Dict = Depends(require_roles(["Admin", "Vendedor"])),
+              db: Optional[Session] = Depends(get_db)):
+    return venta_service.registrar(datos, usuario, db)
 
 
-@router.get("/", response_model=VentaListResponse)
-def list_ventas(
-    fecha_desde: Optional[str] = Query(None),
-    fecha_hasta: Optional[str] = Query(None),
-    current_user: Dict[str, object] = Depends(get_current_user),
-    db: Optional[Session] = Depends(get_db),
-):
-    return venta_service.list(
-        user_id=int(current_user["id"]),
-        user_role=str(current_user["rol"]),
-        fecha_desde=fecha_desde,
-        fecha_hasta=fecha_hasta,
-        db=db,
-    )
+@router.patch("/{venta_id}/pagar", summary="Marcar venta como Pagada (RF-39)")
+def pagar(venta_id: int, _u: Dict = Depends(require_roles(["Admin"])), db: Optional[Session] = Depends(get_db)):
+    return venta_service.marcar_pagada(venta_id, db)

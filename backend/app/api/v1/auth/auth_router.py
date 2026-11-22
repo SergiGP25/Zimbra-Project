@@ -4,7 +4,13 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user
 from app.core.database import get_db
-from app.schemas.auth.auth_schema import LoginRequest, TokenResponse, UserAuthProfile
+from app.schemas.auth.auth_schema import (
+    CambioPasswordRequest,
+    LoginRequest,
+    MensajeResponse,
+    TokenResponse,
+    UserAuthProfile,
+)
 from app.services.auth.auth_service import auth_service
 
 router = APIRouter()
@@ -37,6 +43,23 @@ def get_me(current_user: Dict[str, any] = Depends(get_current_user)):
         rol=current_user["rol"],
         activo=current_user["activo"],
     )
+
+
+@router.put(
+    "/password",
+    response_model=MensajeResponse,
+    summary="Cambiar la contraseña del usuario autenticado",
+    description=(
+        "Exige la contraseña actual. La nueva debe tener 8 o más caracteres, "
+        "una mayúscula, una minúscula y un número, y ser distinta de la actual."
+    ),
+)
+def cambiar_password(
+    payload: CambioPasswordRequest,
+    current_user: Dict[str, any] = Depends(get_current_user),
+    db: Optional[Session] = Depends(get_db),
+):
+    return auth_service.cambiar_password(current_user, payload, db=db)
 
 
 @router.post(

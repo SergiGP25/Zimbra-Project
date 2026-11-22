@@ -25,6 +25,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     )
   }
 
+  // HU-04: Restricción por rol (403 Forbidden visual)
   if (allowedRoles && allowedRoles.length > 0) {
     const hasRole = allowedRoles.some(
       (r) => r.toLowerCase() === user.rol.toLowerCase()
@@ -34,11 +35,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       return (
         <div className="forbidden-box">
           <div className="forbidden-icon">⛔ 403</div>
-          <h3>Acceso restringido</h3>
+          <h3>Acceso Denegado (Forbidden)</h3>
           <p>
             Tu rol actual es <strong>{user.rol}</strong>. Esta sección está restringida
             exclusivamente a usuarios con roles: <strong>{allowedRoles.join(', ')}</strong>.
           </p>
+          <div className="hint">
+            Cumplimiento HU-04: Control de acceso estricto por rol.
+          </div>
         </div>
       )
     }
@@ -46,3 +50,4 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   return <>{children}</>
 }
+
