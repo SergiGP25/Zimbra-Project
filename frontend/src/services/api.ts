@@ -46,8 +46,15 @@ export async function request<T>(
     let errorDetail = `Error ${response.status}: ${response.statusText}`
     try {
       const errorJson = await response.json()
-      if (errorJson.detail) {
+      if (typeof errorJson.detail === 'string') {
         errorDetail = errorJson.detail
+      } else if (Array.isArray(errorJson.detail)) {
+        // 422 de FastAPI: detail es una lista con un error por campo.
+        // Pydantic antepone "Value error, " a los mensajes de los validadores.
+        errorDetail = errorJson.detail
+          .map((e: { msg?: string }) => (e.msg || '').replace(/^Value error, /, ''))
+          .filter(Boolean)
+          .join('. ')
       }
     } catch {
       // Ignorar si el cuerpo no es JSON
