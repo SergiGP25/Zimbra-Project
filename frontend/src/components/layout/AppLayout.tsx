@@ -1,6 +1,6 @@
 import React from 'react'
 import { coincide } from '../../router/router'
-import { Navbar } from './Navbar'
+import { Topbar } from './Topbar'
 import { Sidebar } from './Sidebar'
 import { PanelPage } from '../../pages/app/PanelPage'
 import { ProspectosPage } from '../../pages/app/ProspectosPage'
@@ -51,10 +51,12 @@ export const AppLayout: React.FC<{ ruta: string }> = ({ ruta }) => {
 
   return (
     <div className="app-layout">
-      <Navbar />
       <div className="main-content-layout">
         <Sidebar rutaActual={ruta} />
-        <main className="page-content">{contenido}</main>
+        <main className="page-content">
+          <Topbar rutaActual={ruta} />
+          {contenido}
+        </main>
       </div>
     </div>
   )

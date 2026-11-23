@@ -171,4 +171,6 @@ export interface Panel {
   ventas_mes: number
   monto_mes: number
   ventas_pendientes_pago: number
+  serie_meses: { mes: string; ventas: number; monto: number; prospectos: number; pruebas: number }[]
+  productos_top: { producto_id: number; nombre: string; ventas: number; licencias: number; monto: number }[]
 }

@@ -30,6 +30,8 @@
   --brand-deep: #2d2b55;     /* franjas de marca */
   --brand-orchid: #a678b9;   /* detalles decorativos */
   --brand-cream: #f0d9b5;
+  --grad: linear-gradient(90deg, #a678b9, #f4a62a); /* orquídea -> ámbar */
+  --kpi-tinte: rgba(106, 90, 205, 0.1);
   --glow-a: rgba(106, 90, 205, 0.16);
   --glow-b: rgba(244, 166, 42, 0.14);
   --danger: #b42318;
@@ -43,11 +45,11 @@
 
 [data-theme='dark'] {
   --paper: #1a1a1f;
-  --surface: #23223a;
-  --surface-sunken: #1e1d2c;
+  --surface: #121217;        /* tarjetas: más oscuras que el fondo, como en el diseño */
+  --surface-sunken: #23222f;
   --ink: #f2ece3;
   --ink-soft: #b9b2cc;
-  --line: #38365e;
+  --line: #2c2b3d;
   --accent: #f4a62a;
   --accent-strong: #f7bd5e;
   --accent-wash: #3a2f1f;
@@ -56,6 +58,8 @@
   --brand-deep: #2d2b55;
   --brand-orchid: #a678b9;
   --brand-cream: #f0d9b5;
+  --grad: linear-gradient(90deg, #a678b9, #f4a62a);
+  --kpi-tinte: rgba(45, 43, 85, 0.45);
   --glow-a: rgba(106, 90, 205, 0.32);
   --glow-b: rgba(244, 166, 42, 0.18);
   --danger: #ff8a7a;
