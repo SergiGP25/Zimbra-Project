@@ -131,3 +131,19 @@ code {
     transition: none !important;
   }
 }
+
+/* Autocompletado del navegador: en lugar del fondo amarillo, el color del campo con un toque violeta */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px color-mix(in srgb, var(--accent, #6a5acd) 12%, var(--surface, #fff)) inset;
+  box-shadow: 0 0 0 1000px color-mix(in srgb, var(--accent, #6a5acd) 12%, var(--surface, #fff)) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+input:autofill {
+  background-color: color-mix(in srgb, var(--accent, #6a5acd) 12%, var(--surface, #fff));
+}
