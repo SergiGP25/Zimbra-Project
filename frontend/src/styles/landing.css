@@ -746,3 +746,14 @@
   .site-header .logo-nombre { font-size: 1.15rem; }
   .site-header .btn { padding-inline: 0.8rem; font-size: 0.9rem; }
 }
+
+/* Secciones separadas: franjas alternas, línea divisoria y más aire */
+.landing .band { border-top: 1px solid var(--line); }
+.landing .band-inner { padding: 5.5rem 1.5rem; }
+.landing #como-funciona,
+.landing #prueba { background: color-mix(in srgb, var(--accent) 5%, var(--paper)); }
+[data-theme='dark'] .landing #como-funciona,
+[data-theme='dark'] .landing #prueba { background: color-mix(in srgb, var(--accent) 7%, #141419); }
+@media (max-width: 720px) {
+  .landing .band-inner { padding: 3.75rem 1.25rem; }
+}
