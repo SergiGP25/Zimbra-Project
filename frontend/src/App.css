@@ -5,21 +5,30 @@
 */
 
 /* ---------- Estructura ---------- */
+/*
+  El marco ocupa exactamente la pantalla (100dvh): la barra superior y el
+  menú lateral quedan fijos y solo se desplaza el contenido de la página.
+  Si el menú tiene más opciones de las que caben, se desplaza por dentro.
+*/
 .app-layout {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* en celulares descuenta la barra del navegador */
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .main-content-layout {
   display: flex;
   flex: 1;
+  min-height: 0; /* sin esto, los hijos no pueden tener su propio scroll */
 }
 
 .page-content {
   flex: 1;
   min-width: 0;
   padding: 2rem;
+  overflow-y: auto;
 }
 
 /* ---------- Barra superior ---------- */
@@ -91,6 +100,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-y: auto;          /* muchas opciones: el menú se desplaza solo */
+  overscroll-behavior: contain;
 }
 
 .sidebar-heading {
@@ -705,10 +716,22 @@
     flex-direction: column;
   }
 
+  /* En pantallas pequeñas vuelve el desplazamiento normal de la página */
+  .app-layout {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .page-content {
+    overflow-y: visible;
+  }
+
   .sidebar {
     width: auto;
     border-right: none;
     border-bottom: 1px solid var(--line);
+    overflow-y: visible;
   }
 
   .sidebar-role-info,

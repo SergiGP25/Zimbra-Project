@@ -23,7 +23,7 @@ class PruebaRepository:
                AND (:prospecto IS NULL OR d.prospecto_id = :prospecto)
                AND (:vendedor IS NULL OR p.empleado_id = :vendedor)
                AND (:por_vencer = 0 OR (d.estado = 'Activa' AND DATEDIFF(d.fecha_fin, CURRENT_DATE) BETWEEN 0 AND 7))
-             ORDER BY d.estado = 'Activa' DESC, d.fecha_fin
+             ORDER BY d.fecha_inicio DESC, d.descarga_id DESC
         """
         params = {"estado": estado, "prospecto": prospecto_id, "vendedor": solo_vendedor, "por_vencer": int(por_vencer)}
         return [dict(f) for f in db.execute(text(sql), params).mappings().all()]

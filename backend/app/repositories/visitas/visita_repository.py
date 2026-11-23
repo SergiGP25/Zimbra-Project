@@ -11,7 +11,7 @@ class VisitaRepository:
               FROM visita_web v JOIN prospecto p ON p.prospecto_id = v.prospecto_id
              WHERE (:prospecto IS NULL OR v.prospecto_id = :prospecto)
                AND (:vendedor IS NULL OR p.empleado_id = :vendedor)
-             ORDER BY v.fecha_hora DESC
+             ORDER BY v.fecha_hora DESC, v.visita_id DESC
              LIMIT :limite
         """
         params = {"prospecto": prospecto_id, "vendedor": solo_vendedor, "limite": limite}

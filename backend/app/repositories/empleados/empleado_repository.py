@@ -111,7 +111,7 @@ class EmpleadoRepository:
                     fecha_creacion
                 FROM empleado
                 {where_clause}
-                ORDER BY empleado_id ASC
+                ORDER BY empleado_id DESC   -- los más recientes primero
             """)
             rows = session.execute(sql, params).mappings().all()
             return [dict(r) for r in rows]

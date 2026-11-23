@@ -14,7 +14,7 @@ class AlertaRepository:
               JOIN empleado e ON e.empleado_id = a.empleado_id
              WHERE (:empleado IS NULL OR a.empleado_id = :empleado)
                AND (:pendientes = 0 OR a.atendida = FALSE)
-             ORDER BY a.atendida, a.fecha_hora DESC
+             ORDER BY a.fecha_hora DESC, a.alerta_id DESC
         """
         params = {"empleado": empleado_id, "pendientes": int(solo_pendientes)}
         return [dict(f) for f in db.execute(text(sql), params).mappings().all()]

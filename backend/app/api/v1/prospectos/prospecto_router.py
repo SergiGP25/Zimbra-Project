@@ -20,7 +20,7 @@ def listar_prospectos(
     campana_id: Optional[int] = None,
     vendedor_id: Optional[int] = None,
     sin_vendedor: bool = False,
-    orden: str = Query("puntaje", pattern="^(puntaje|fecha|nombre|empresa)$"),
+    orden: str = Query("fecha", pattern="^(puntaje|fecha|nombre|empresa)$"),
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),
     usuario: Dict = Depends(get_current_user),

@@ -21,7 +21,7 @@ export const ProspectosPage: React.FC<{ params: Record<string, string> }> = () =
   const esVendedor = user?.rol === 'Vendedor'
   const inicial = new URLSearchParams(window.location.search)   // ej. /app/prospectos?estado=Calificado
   const [filtros, setFiltros] = useState({
-    q: '', estado: inicial.get('estado') || '', campana_id: inicial.get('campana_id') || '', vendedor_id: '', sin_vendedor: false, orden: 'puntaje', pagina: 1,
+    q: '', estado: inicial.get('estado') || '', campana_id: inicial.get('campana_id') || '', vendedor_id: '', sin_vendedor: false, orden: 'fecha', pagina: 1,
   })
   const [busqueda, setBusqueda] = useState('')
   const [ventana, setVentana] = useState<Ventana>(null)
@@ -40,7 +40,7 @@ export const ProspectosPage: React.FC<{ params: Record<string, string> }> = () =
   return (
     <div>
       <Encabezado titulo={esVendedor ? 'Mis prospectos' : 'Prospectos'}
-        descripcion={esVendedor ? 'Solo ves los prospectos asignados a ti.' : 'Todos los prospectos de la empresa, ordenados por puntaje.'}>
+        descripcion={esVendedor ? 'Solo ves los prospectos asignados a ti.' : 'Todos los prospectos de la empresa; los más recientes primero.'}>
         <button type="button" className="btn btn-primary" disabled={!catalogos.datos} onClick={() => setVentana({ tipo: 'nuevo' })}>
           Registrar prospecto
         </button>
@@ -75,8 +75,8 @@ export const ProspectosPage: React.FC<{ params: Record<string, string> }> = () =
           </>
         )}
         <select className="input select-filter" value={filtros.orden} onChange={(e) => filtrar('orden', e.target.value)} aria-label="Ordenar por">
-          <option value="puntaje">Mayor puntaje</option>
           <option value="fecha">Más recientes</option>
+          <option value="puntaje">Mayor puntaje</option>
           <option value="nombre">Nombre</option>
           <option value="empresa">Empresa</option>
         </select>

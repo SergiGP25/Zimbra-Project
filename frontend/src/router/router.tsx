@@ -20,6 +20,8 @@ export function navegar(ruta: string, opciones: { reemplazar?: boolean } = {}) {
   else window.history.pushState(null, '', ruta)
   window.dispatchEvent(new Event(EVENTO))
   window.scrollTo(0, 0)
+  // Dentro del CRM se desplaza el contenido, no la ventana (ver .page-content en App.css)
+  document.querySelector('.page-content')?.scrollTo(0, 0)
 }
 
 /** Devuelve la ruta actual y se actualiza cuando cambia (también con Atrás/Adelante). */

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Empleado, RolType } from '../../types/empleados/empleadoTypes'
 import { empleadoService } from '../../services/empleados/empleadoService'
 import { EmpleadoModal } from './EmpleadoModal'
+import { Paginacion, usePaginacion } from '../ui/ui'
 
 export const EmpleadoList: React.FC = () => {
   const [empleados, setEmpleados] = useState<Empleado[]>([])
@@ -16,6 +17,8 @@ export const EmpleadoList: React.FC = () => {
   // Estado del Modal
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEmpleado, setSelectedEmpleado] = useState<Empleado | null>(null)
+  // 20 por página (RNF-04); el backend los entrega del más reciente al más antiguo
+  const pag = usePaginacion(empleados)
 
   const fetchEmpleados = async () => {
     setLoading(true)
@@ -173,7 +176,7 @@ export const EmpleadoList: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {empleados.map((emp) => (
+              {pag.visibles.map((emp) => (
                 <tr key={emp.id} className={!emp.activo ? 'row-inactive' : ''}>
                   <td><strong>#{emp.id}</strong></td>
                   <td>{emp.nombre}</td>
@@ -214,6 +217,7 @@ export const EmpleadoList: React.FC = () => {
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="empleados" />
 
       <EmpleadoModal
         isOpen={isModalOpen}

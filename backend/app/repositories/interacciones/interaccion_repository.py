@@ -17,7 +17,7 @@ class InteraccionRepository:
                AND (:tipo IS NULL OR i.tipo = :tipo)
                AND (:resultado IS NULL OR i.resultado = :resultado)
                AND (:vendedor IS NULL OR p.empleado_id = :vendedor)
-             ORDER BY i.fecha_hora DESC
+             ORDER BY i.fecha_hora DESC, i.interaccion_id DESC
              LIMIT 300
         """
         params = {"prospecto": prospecto_id, "tipo": tipo, "resultado": resultado, "vendedor": solo_vendedor}

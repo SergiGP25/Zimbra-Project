@@ -51,7 +51,7 @@ class ProspectoRepository:
         where = " WHERE " + " AND ".join(condiciones)
 
         total = db.execute(text("SELECT COUNT(*) " + _FROM + where), params).scalar() or 0
-        sql = f"SELECT {_COLUMNAS} {_FROM} {where} ORDER BY {_ORDENES.get(orden, _ORDENES['puntaje'])} LIMIT :lim OFFSET :off"
+        sql = f"SELECT {_COLUMNAS} {_FROM} {where} ORDER BY {_ORDENES.get(orden, _ORDENES['fecha'])} LIMIT :lim OFFSET :off"
         return _filas(db, sql, {**params, "lim": limite, "off": desplazamiento}), total
 
     def opciones(self, db: Session, solo_vendedor: Optional[int]) -> List[Dict[str, Any]]:

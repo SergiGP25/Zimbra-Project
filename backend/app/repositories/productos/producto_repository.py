@@ -15,7 +15,7 @@ class ProductoRepository:
               FROM producto pr
              WHERE (:version IS NULL OR pr.version = :version)
                AND (:activo IS NULL OR pr.activo = :activo)
-             ORDER BY pr.version, pr.nombre
+             ORDER BY pr.producto_id DESC   -- los más recientes primero
         """
         filas = db.execute(text(sql), {"version": version, "activo": activo}).mappings().all()
         return [dict(f) for f in filas]

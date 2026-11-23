@@ -30,7 +30,7 @@ class CampanaRepository:
                AND (:vigentes = 0 OR (c.fecha_inicio <= CURRENT_DATE AND (c.fecha_fin IS NULL OR c.fecha_fin >= CURRENT_DATE)))
                AND (:hasta IS NULL OR c.fecha_inicio <= :hasta)
                AND (:desde IS NULL OR c.fecha_fin IS NULL OR c.fecha_fin >= :desde)
-             ORDER BY c.fecha_inicio DESC
+             ORDER BY c.fecha_inicio DESC, c.campana_id DESC
         """
         params = {"canal": canal, "vigentes": int(solo_vigentes), "desde": desde, "hasta": hasta}
         return [dict(f) for f in db.execute(text(sql), params).mappings().all()]
