@@ -61,7 +61,7 @@ export const Sidebar: React.FC<{ rutaActual: string }> = ({ rutaActual }) => {
   return (
     <aside className="sidebar">
       <Enlace to="/app" className="sidebar-brand" aria-label="Zimbra CRM, ir al panel">
-        <Logo tamano={34} className="logo-claro" />
+        <Logo tamano={34} className="logo-menu" />
       </Enlace>
 
       <nav aria-label="Módulos" className="sidebar-nav-scroll">
