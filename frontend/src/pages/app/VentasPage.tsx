@@ -5,13 +5,13 @@ import { useCarga } from '../../lib/useCarga'
 import { descargarCSV, formatoFecha, formatoMoneda } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { ventaService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Indicador, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Indicador, Vacio, Paginacion, usePaginacion, SelectorVendedor } from '../../components/ui/ui'
 import { FormVenta } from '../../components/crm/Formularios'
 
 /* RF-36 a RF-39: ventas, filtro por fechas y estado de pago. */
 export const VentasPage: React.FC<{ params: Record<string, string> }> = () => {
   const { user } = useAuth()
-  const [filtros, setFiltros] = useState({ desde: '', hasta: '', estado: '' })
+  const [filtros, setFiltros] = useState({ desde: '', hasta: '', estado: '', vendedor_id: '' })
   const [nueva, setNueva] = useState(false)
   const [aviso, setAviso] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => ventaService.listar(filtros), [JSON.stringify(filtros)])
@@ -44,6 +44,8 @@ export const VentasPage: React.FC<{ params: Record<string, string> }> = () => {
         <select className="input select-filter" value={filtros.estado} onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })} aria-label="Estado de pago">
           <option value="">Pagadas y pendientes</option><option>Pendiente</option><option>Pagada</option>
         </select>
+        {/* HU-34: el vendedor ya ve solo sus ventas; Admin y Marketing pueden filtrar por vendedor */}
+        {user?.rol !== 'Vendedor' && <SelectorVendedor valor={filtros.vendedor_id} onChange={(v) => setFiltros({ ...filtros, vendedor_id: v })} />}
       </div>
       {datos && (
         <div className="kpi-grid kpi-grid-2">

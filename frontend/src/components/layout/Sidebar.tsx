@@ -26,7 +26,7 @@ const OPCIONES: Opcion[] = [
   { ruta: '/app/interacciones', texto: 'Interacciones', roles: ['Admin', 'Marketing', 'Vendedor'], grupo: 'Ventas' },
   { ruta: '/app/propuestas', texto: 'Propuestas', roles: ['Admin', 'Marketing', 'Vendedor'], grupo: 'Ventas' },
   { ruta: '/app/ventas', texto: 'Ventas', roles: ['Admin', 'Marketing', 'Vendedor'], grupo: 'Ventas' },
-  { ruta: '/app/reportes', texto: 'Reportes', roles: ['Admin', 'Marketing'], grupo: 'Análisis' },
+  { ruta: '/app/reportes', texto: 'Reportes', roles: ['Admin', 'Marketing', 'Vendedor'], grupo: 'Análisis' },
   { ruta: '/app/productos', texto: 'Productos', roles: ['Admin', 'Marketing', 'Vendedor'], grupo: 'Administración' },
   { ruta: '/app/empleados', texto: 'Empleados', roles: ['Admin'], grupo: 'Administración' },
 ]

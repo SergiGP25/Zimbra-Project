@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Dict, Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -17,10 +18,12 @@ def listar(
     prospecto_id: Optional[int] = None,
     vendedor_id: Optional[int] = None,
     sin_venta: bool = Query(False, description="Solo las que todavía no tienen venta"),
+    desde: Optional[date] = Query(None, description="Emitidas desde esta fecha (HU-32)"),
+    hasta: Optional[date] = Query(None, description="Emitidas hasta esta fecha"),
     usuario: Dict = Depends(get_current_user),
     db: Optional[Session] = Depends(get_db),
 ):
-    return propuesta_service.listar(db, usuario, estado, prospecto_id, vendedor_id, sin_venta)
+    return propuesta_service.listar(db, usuario, estado, prospecto_id, vendedor_id, sin_venta, desde, hasta)
 
 
 @router.post("/", status_code=201, summary="Crear propuesta (RF-32, RF-33; el trigger calcula el valor)")

@@ -3,7 +3,14 @@ from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.publico.publico_schema import ProductoGratuito, PruebaRegistrada, SolicitudPrueba
+from app.schemas.publico.publico_schema import (
+    PortalPrueba,
+    ProductoGratuito,
+    PruebaRegistrada,
+    SolicitudPrueba,
+    VisitaPortal,
+    VisitaPortalRegistrada,
+)
 from app.services.notificaciones import notificacion_service
 from app.services.publico.publico_service import publico_service
 
@@ -43,5 +50,24 @@ def registrar_prueba_gratis(datos: SolicitudPrueba, tareas: BackgroundTasks, db:
     if resultado.prospecto_nuevo:
         tareas.add_task(notificacion_service.registro_recibido, datos.email, datos.nombre)
     tareas.add_task(notificacion_service.prueba_activada, datos.email, datos.nombre,
-                    resultado.producto, resultado.fecha_inicio, resultado.fecha_fin)
+                    resultado.producto, resultado.fecha_inicio, resultado.fecha_fin, resultado.prospecto_id)
     return resultado
+
+
+@router.get(
+    "/mi-prueba",
+    response_model=PortalPrueba,
+    summary="Portal del visitante: estado de su prueba (enlace del correo)",
+    description="Se entra con el enlace personal del correo, sin contraseña. Abrirlo cuenta como visita web (T2), una vez al día.",
+)
+def ver_mi_prueba(token: str, db: Optional[Session] = Depends(get_db)):
+    return publico_service.ver_portal(token, db)
+
+
+@router.post(
+    "/mi-prueba/visita",
+    response_model=VisitaPortalRegistrada,
+    summary="El visitante abre precios, características o soporte: visita web (T2)",
+)
+def visitar_seccion(datos: VisitaPortal, db: Optional[Session] = Depends(get_db)):
+    return publico_service.visitar_seccion(datos.token, datos.pagina, db)

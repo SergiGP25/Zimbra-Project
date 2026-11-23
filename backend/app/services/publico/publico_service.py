@@ -4,8 +4,16 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
+from app.core.db_utils import llamar_transaccion
+from app.core.security import decode_access_token
 from app.repositories.publico.publico_repository import PublicoRepository, publico_repository
-from app.schemas.publico.publico_schema import ProductoGratuito, PruebaRegistrada, SolicitudPrueba
+from app.schemas.publico.publico_schema import (
+    PortalPrueba,
+    ProductoGratuito,
+    PruebaRegistrada,
+    SolicitudPrueba,
+    VisitaPortalRegistrada,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -130,6 +138,51 @@ class PublicoService:
             mensaje=f"Tu prueba de {producto['nombre']} está activa hasta el {descarga['fecha_fin']:%d/%m/%Y}.",
             prospecto_nuevo=nuevo,
         )
+
+
+    # ------------------------------------------------------------------
+    # Portal "Mi prueba": así "entra" el visitante. No tiene usuario en el
+    # CRM (el CRM es del equipo comercial); recibe un enlace personal por
+    # correo. Cada sección que abre se registra como visita web con la
+    # misma transacción T2 del simulador, así suma puntaje y, si ya está
+    # Calificado, le genera la alerta a su vendedor.
+    # ------------------------------------------------------------------
+    def _prospecto_del_token(self, token: str) -> int:
+        datos = decode_access_token(token)
+        if not datos or datos.get("tipo") != "portal":
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                "El enlace no es válido o ya venció. Escríbenos y te enviamos uno nuevo.")
+        return int(datos["sub"])
+
+    def _registrar_visita(self, db: Session, prospecto_id: int, pagina: str) -> bool:
+        if self.repo.visito_hoy(db, prospecto_id, pagina):
+            return False
+        try:
+            llamar_transaccion(db, "sp_registrar_visita",
+                               {"prospecto": prospecto_id, "pagina": pagina, "duracion": 60},
+                               salidas=["visita", "alerta"])
+            return True
+        except DBAPIError as error:
+            # Si la base rechaza la visita, el visitante igual debe poder ver su prueba
+            db.rollback()
+            logger.warning("No se registró la visita del portal (%s): %s", pagina, error.orig)
+            return False
+
+    def ver_portal(self, token: str, db: Optional[Session]) -> PortalPrueba:
+        db = self._exigir_db(db)
+        prospecto_id = self._prospecto_del_token(token)
+        datos = self.repo.obtener_portal(db, prospecto_id)
+        if not datos:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No encontramos tu registro.")
+        self._registrar_visita(db, prospecto_id, "/mi-prueba")
+        return PortalPrueba(**datos)
+
+    def visitar_seccion(self, token: str, pagina: str, db: Optional[Session]) -> VisitaPortalRegistrada:
+        db = self._exigir_db(db)
+        prospecto_id = self._prospecto_del_token(token)
+        if self._registrar_visita(db, prospecto_id, pagina):
+            return VisitaPortalRegistrada(registrada=True, mensaje="Visita registrada.")
+        return VisitaPortalRegistrada(registrada=False, mensaje="Ya habías visitado esta sección hoy.")
 
 
 publico_service = PublicoService()

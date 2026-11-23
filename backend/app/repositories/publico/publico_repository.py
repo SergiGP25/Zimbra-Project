@@ -4,6 +4,39 @@ from sqlalchemy.orm import Session
 
 
 class PublicoRepository:
+    # ------------------------------------------------------------------
+    # Portal "Mi prueba" del visitante
+    # ------------------------------------------------------------------
+    def obtener_portal(self, db: Session, prospecto_id: int) -> Optional[Dict[str, Any]]:
+        fila = db.execute(text("""
+            SELECT p.prospecto_id, p.nombre, p.empresa, p.estado,
+                   e.nombre AS asesor, e.email AS asesor_email
+              FROM prospecto p
+              LEFT JOIN empleado e ON e.empleado_id = p.empleado_id AND e.activo = TRUE
+             WHERE p.prospecto_id = :id
+        """), {"id": prospecto_id}).mappings().first()
+        if not fila:
+            return None
+        pruebas = db.execute(text("""
+            SELECT pr.nombre AS producto, pr.descripcion, d.fecha_inicio, d.fecha_fin, d.estado,
+                   GREATEST(DATEDIFF(d.fecha_fin, CURRENT_DATE), 0) AS dias_restantes
+              FROM descarga_prueba d
+              JOIN producto pr ON pr.producto_id = d.producto_id
+             WHERE d.prospecto_id = :id
+             ORDER BY d.fecha_inicio DESC, d.descarga_id DESC
+        """), {"id": prospecto_id}).mappings().all()
+        return {**dict(fila), "pruebas": [dict(x) for x in pruebas]}
+
+    def visito_hoy(self, db: Session, prospecto_id: int, pagina: str) -> bool:
+        """¿Ya hay una visita de hoy a esa página? Evita sumar puntos con solo recargar."""
+        fila = db.execute(text("""
+            SELECT 1 FROM visita_web
+             WHERE prospecto_id = :id AND pagina_visitada = :pagina
+               AND fecha_hora >= CURRENT_DATE
+             LIMIT 1
+        """), {"id": prospecto_id, "pagina": pagina}).first()
+        return fila is not None
+
     """
     SQL que usa el formulario público de prueba gratis.
     Igual que los demás repositorios: solo consultas, sin reglas de negocio
@@ -14,7 +47,7 @@ class PublicoRepository:
 
     def listar_productos_gratuitos(self, db: Session) -> List[Dict[str, Any]]:
         sql = text("""
-            SELECT producto_id, nombre, version
+            SELECT producto_id, nombre, descripcion, version
               FROM producto
              WHERE version = 'Gratuita' AND activo = TRUE
              ORDER BY nombre
@@ -24,7 +57,7 @@ class PublicoRepository:
     def listar_planes(self, db: Session) -> List[Dict[str, Any]]:
         """Productos comerciales activos con su precio por licencia."""
         sql = text("""
-            SELECT producto_id, nombre, precio_unitario
+            SELECT producto_id, nombre, descripcion, precio_unitario
               FROM producto
              WHERE version = 'Comercial' AND activo = TRUE
              ORDER BY precio_unitario, nombre

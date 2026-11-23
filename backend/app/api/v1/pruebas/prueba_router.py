@@ -30,7 +30,7 @@ def registrar(datos: PruebaCreate, tareas: BackgroundTasks,
     # El correo sale DESPUÉS de responder: si falla, la prueba ya quedó guardada
     if prueba and prueba.get("prospecto_email"):
         tareas.add_task(notificacion_service.prueba_activada, prueba["prospecto_email"], prueba["prospecto"],
-                        prueba["producto"], prueba["fecha_inicio"], prueba["fecha_fin"])
+                        prueba["producto"], prueba["fecha_inicio"], prueba["fecha_fin"], prueba["prospecto_id"])
     return prueba
 
 

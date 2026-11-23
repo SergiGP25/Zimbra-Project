@@ -34,9 +34,17 @@ VISTAS = {
 class ReporteService:
     """Reportes (RF-40 a RF-46). Cada uno llama un procedimiento almacenado de 07_reportes.sql."""
 
-    def ventas_mensual(self, db: Optional[Session], anio: int, mes: int) -> Dict[str, Any]:
+    def ventas_mensual(self, db: Optional[Session], anio: int, mes: int,
+                       usuario: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         detalle, total = llamar_reporte(exigir_db(db), "sp_reporte_ventas_mensual", [anio, mes])
-        return {"detalle": detalle, "total": total[0] if total else {}}
+        total = total[0] if total else {}
+        if usuario and es_vendedor(usuario):
+            # HU-37 y RN-12: el vendedor ve solo su fila, y los totales son los suyos
+            detalle = [f for f in detalle if f.get("empleado_id") == usuario["id"]]
+            propia = detalle[0] if detalle else {}
+            total = {**total, "num_ventas": propia.get("num_ventas", 0), "monto_total": propia.get("monto_total", 0),
+                     "pagadas": None, "pendientes": None}
+        return {"detalle": detalle, "total": total}
 
     def resumen_anual(self, db: Optional[Session], anio: int):
         return llamar_reporte(exigir_db(db), "sp_reporte_resumen_anual", [anio])[0]

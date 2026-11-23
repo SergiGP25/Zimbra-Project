@@ -29,6 +29,14 @@ const PASOS = [
 
 const PREGUNTAS = [
   {
+    p: '¿Qué opción de prueba elijo?',
+    r: 'Cada opción es una parte de Zimbra y debajo de su nombre explica para qué sirve. Si no sabes cuál, empieza por la Network Edition: es la edición completa, con correo, calendario, archivos y celular.',
+  },
+  {
+    p: 'Ya activé mi prueba, ¿cómo entro?',
+    r: 'Te llega un correo con el enlace a tu página «Mi prueba». Ahí ves cuántos días te quedan, cómo empezar y quién es tu asesor. No necesitas usuario ni contraseña: el enlace es solo tuyo. El botón «Iniciar sesión» es para el equipo comercial de Zimbra.',
+  },
+  {
     p: '¿Necesito tarjeta de crédito para la prueba?',
     r: 'No. Solo tu nombre y un correo de trabajo. La prueba se activa al instante y dura 60 días.',
   },

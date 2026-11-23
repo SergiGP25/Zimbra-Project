@@ -28,7 +28,8 @@ class ProductoService:
 
     def crear(self, datos: ProductoCreate, db: Optional[Session]) -> ProductoResponse:
         db = exigir_db(db)
-        nuevo_id = self.repo.crear(db, datos.nombre.strip(), datos.version, datos.precio_unitario)
+        nuevo_id = self.repo.crear(db, datos.nombre.strip(), datos.version, datos.precio_unitario,
+                                   (datos.descripcion or "").strip() or None)
         db.commit()
         return ProductoResponse(**self.repo.obtener(db, nuevo_id))
 

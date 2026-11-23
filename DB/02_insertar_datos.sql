@@ -127,6 +127,38 @@ INSERT INTO producto (producto_id, nombre, version, precio_unitario, activo) VAL
     (29, 'ZCS Educativo', 'Comercial', 56000.00, FALSE),
     (30, 'ZCS Gobierno', 'Comercial', 200000.00, TRUE);
 
+-- Descripción de cada producto: le explica al visitante qué es y para qué sirve
+UPDATE producto SET descripcion = 'Correo, calendario y contactos de código abierto, para instalar en tu propio servidor.' WHERE producto_id = 1;
+UPDATE producto SET descripcion = 'La edición empresarial completa durante 60 días: correo, calendario, archivos compartidos, sincronización móvil y soporte.' WHERE producto_id = 2;
+UPDATE producto SET descripcion = 'La edición Professional durante 60 días: pensada para empresas medianas, con sincronización móvil y archivado de correos.' WHERE producto_id = 3;
+UPDATE producto SET descripcion = 'Aplicación de escritorio para Windows, Mac o Linux: lees y respondes tu correo aunque no tengas internet.' WHERE producto_id = 4;
+UPDATE producto SET descripcion = 'El correo en el navegador, sin instalar nada: bandeja de entrada, calendario y contactos desde cualquier equipo.' WHERE producto_id = 5;
+UPDATE producto SET descripcion = 'Lleva el correo, el calendario y los contactos al celular y mantenlos sincronizados.' WHERE producto_id = 6;
+UPDATE producto SET descripcion = 'Crea y edita documentos, hojas de cálculo y presentaciones en línea con tu equipo.' WHERE producto_id = 7;
+UPDATE producto SET descripcion = 'Copias de seguridad automáticas de los buzones (prueba no disponible por ahora).' WHERE producto_id = 8;
+UPDATE producto SET descripcion = 'Plan base: correo, calendario y contactos para cada usuario de tu empresa.' WHERE producto_id = 9;
+UPDATE producto SET descripcion = 'Plan Standard más sincronización móvil, archivado y herramientas de colaboración.' WHERE producto_id = 10;
+UPDATE producto SET descripcion = 'Plan completo: todo lo de Professional más alta disponibilidad, seguridad avanzada y soporte prioritario.' WHERE producto_id = 11;
+UPDATE producto SET descripcion = 'Sincronización del correo y el calendario con celulares y tabletas.' WHERE producto_id = 12;
+UPDATE producto SET descripcion = 'Aplicación de escritorio con soporte y actualizaciones para toda la empresa.' WHERE producto_id = 13;
+UPDATE producto SET descripcion = 'Guarda una copia de todos los correos para auditorías y requisitos legales.' WHERE producto_id = 14;
+UPDATE producto SET descripcion = 'Llamadas de voz por internet integradas con el correo y los contactos.' WHERE producto_id = 15;
+UPDATE producto SET descripcion = 'Copias de seguridad automáticas y restauración de buzones en minutos.' WHERE producto_id = 16;
+UPDATE producto SET descripcion = 'Documentos, hojas de cálculo y presentaciones en línea, alojados por Zimbra.' WHERE producto_id = 17;
+UPDATE producto SET descripcion = 'Busca en todos los correos y adjuntos de la empresa con filtros avanzados.' WHERE producto_id = 18;
+UPDATE producto SET descripcion = 'El plan Standard pagado por un año completo.' WHERE producto_id = 19;
+UPDATE producto SET descripcion = 'El plan Professional pagado por un año completo.' WHERE producto_id = 20;
+UPDATE producto SET descripcion = 'El plan Enterprise pagado por un año completo.' WHERE producto_id = 21;
+UPDATE producto SET descripcion = 'Filtro de spam y virus, cifrado de mensajes y doble factor de autenticación.' WHERE producto_id = 22;
+UPDATE producto SET descripcion = 'Agendas compartidas entre equipos y reserva de salas.' WHERE producto_id = 23;
+UPDATE producto SET descripcion = 'Chat entre los usuarios de la empresa, integrado con el correo.' WHERE producto_id = 24;
+UPDATE producto SET descripcion = 'Servidores en espejo para que el correo siga funcionando si uno falla.' WHERE producto_id = 25;
+UPDATE producto SET descripcion = 'Atención prioritaria 24/7 con tiempos de respuesta garantizados.' WHERE producto_id = 26;
+UPDATE producto SET descripcion = 'Un equipo de Zimbra traslada tus correos y contactos desde el sistema anterior.' WHERE producto_id = 27;
+UPDATE producto SET descripcion = 'Estadísticas de uso del correo y de las visitas al sitio de la empresa.' WHERE producto_id = 28;
+UPDATE producto SET descripcion = 'Licencias con descuento para colegios y universidades (no disponible por ahora).' WHERE producto_id = 29;
+UPDATE producto SET descripcion = 'Licencias con requisitos de seguridad y soporte para entidades públicas.' WHERE producto_id = 30;
+
 -- PROSPECTO: 60 registros
 INSERT INTO prospecto (prospecto_id, nombre, empresa, email, telefono, estado, puntaje_calificacion, fecha_registro, empleado_id, campana_id) VALUES
     (1, 'Camila Quintero', 'Inversiones Boyaca S.A', 'camila.quintero1@inversionesboyaca.com', '+57 318 9212741', 'Nuevo', 5, '2026-10-21', 9, 29),

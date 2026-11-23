@@ -73,7 +73,7 @@ acompañarte mientras conoces el producto.</p>
     return asunto, html, texto
 
 
-def prueba_activada(nombre: str, producto: str, inicio: date, fin: date) -> Correo:
+def prueba_activada(nombre: str, producto: str, inicio: date, fin: date, enlace: str) -> Correo:
     primer = escape(nombre.split(" ")[0])
     asunto = f"Tu prueba de {producto} está activa"
     html = _marco(
@@ -83,12 +83,14 @@ def prueba_activada(nombre: str, producto: str, inicio: date, fin: date) -> Corr
 <tr><td style="padding:4px 16px;color:{TEXTO_SUAVE};font-size:14px;">Empieza</td><td style="padding:4px 16px;font-weight:700;">{_fecha(inicio)}</td></tr>
 <tr><td style="padding:4px 16px;color:{TEXTO_SUAVE};font-size:14px;">Termina</td><td style="padding:4px 16px;font-weight:700;">{_fecha(fin)}</td></tr>
 </table>
-<p>Antes de que termine te avisaremos. Si quieres seguir, tu asesor te ayuda a elegir un plan.</p>""",
+<p>En tu página personal ves cuántos días te quedan, cómo empezar y quién es tu asesor.
+Guarda este correo: el enlace es solo tuyo y no necesita contraseña.</p>
+{_boton("Ver mi prueba", enlace)}""",
     )
     texto = (
         f"Hola, {nombre.split(' ')[0]}.\n\nTu prueba de {producto} está activa.\n"
         f"Empieza: {_fecha(inicio)}\nTermina: {_fecha(fin)}\n\n"
-        "Antes de que termine te avisaremos."
+        f"Tu página personal (no necesita contraseña): {enlace}"
     )
     return asunto, html, texto
 

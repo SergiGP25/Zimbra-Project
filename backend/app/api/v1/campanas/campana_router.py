@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -15,10 +16,12 @@ gestores = Depends(require_roles(["Admin", "Marketing"]))
 def listar_campanas(
     canal: Optional[str] = Query(None, pattern="^(Email|Web|Referido)$"),
     solo_vigentes: bool = False,
+    desde: Optional[date] = Query(None, description="Campañas activas desde esta fecha (HU-13)"),
+    hasta: Optional[date] = Query(None, description="Campañas activas hasta esta fecha"),
     _usuario=Depends(get_current_user),
     db: Optional[Session] = Depends(get_db),
 ):
-    return campana_service.listar(db, canal, solo_vigentes)
+    return campana_service.listar(db, canal, solo_vigentes, desde, hasta)
 
 
 @router.post("/", response_model=CampanaResponse, status_code=201, summary="Crear campaña (RF-12)")

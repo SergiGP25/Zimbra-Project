@@ -78,13 +78,14 @@ export const SelectorProspecto: React.FC<{
   id?: string
   excluirEstados?: string[]
   requerido?: boolean
-}> = ({ valor, onChange, id, excluirEstados = [], requerido }) => {
+  textoVacio?: string // en un filtro: "Todos los prospectos"
+}> = ({ valor, onChange, id, excluirEstados = [], requerido, textoVacio = 'Elige un prospecto' }) => {
   const { datos, cargando } = useCarga(() => prospectoService.opciones(), [])
   const opciones = (datos || []).filter((p) => !excluirEstados.includes(p.estado))
   return (
     <select id={id} className="input" value={valor} required={requerido}
       onChange={(e) => onChange(e.target.value ? Number(e.target.value) : '')}>
-      <option value="">{cargando ? 'Cargando prospectos…' : 'Elige un prospecto'}</option>
+      <option value="">{cargando ? 'Cargando prospectos…' : textoVacio}</option>
       {opciones.map((p) => (
         <option key={p.prospecto_id} value={p.prospecto_id}>
           {p.nombre}{p.empresa ? `, ${p.empresa}` : ''} ({p.estado})
@@ -138,5 +139,16 @@ export const Paginacion: React.FC<{ estado: EstadoPaginacion; nombre: string }> 
           onClick={() => estado.setPagina(estado.pagina + 1)}>Siguiente</button>
       </div>
     </div>
+  )
+}
+
+/** Lista de vendedores para filtrar (Admin y Marketing). Viene de /prospectos/catalogos. */
+export const SelectorVendedor: React.FC<{ valor: string; onChange: (id: string) => void }> = ({ valor, onChange }) => {
+  const { datos } = useCarga(() => prospectoService.catalogos(), [])
+  return (
+    <select className="input select-filter" value={valor} onChange={(e) => onChange(e.target.value)} aria-label="Vendedor">
+      <option value="">Todos los vendedores</option>
+      {datos?.vendedores.map((v) => <option key={v.empleado_id} value={v.empleado_id}>{v.nombre}</option>)}
+    </select>
   )
 }

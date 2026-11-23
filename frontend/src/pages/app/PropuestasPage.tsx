@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { formatoFecha, formatoMoneda } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { propuestaService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion, SelectorProspecto } from '../../components/ui/ui'
 import { FormPropuesta, FormVenta } from '../../components/crm/Formularios'
 
 /*
@@ -16,9 +16,16 @@ import { FormPropuesta, FormVenta } from '../../components/crm/Formularios'
 export const PropuestasPage: React.FC<{ params: Record<string, string> }> = () => {
   const { user } = useAuth()
   const [estado, setEstado] = useState('')
+  // HU-32: filtrar también por prospecto y por fecha de emisión
+  const [prospecto, setProspecto] = useState<number | ''>('')
+  const [desde, setDesde] = useState('')
+  const [hasta, setHasta] = useState('')
   const [ventana, setVentana] = useState<{ tipo: 'nueva' } | { tipo: 'venta'; id: number } | null>(null)
   const [aviso, setAviso] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null)
-  const { datos, cargando, error, recargar } = useCarga(() => propuestaService.listar({ estado }), [estado])
+  const { datos, cargando, error, recargar } = useCarga(
+    () => propuestaService.listar({ estado, prospecto_id: prospecto || undefined, desde, hasta }),
+    [estado, prospecto, desde, hasta],
+  )
   const pag = usePaginacion(datos)
   const gestiona = puede.gestionarPropuestas(user?.rol)
 
@@ -45,6 +52,9 @@ export const PropuestasPage: React.FC<{ params: Record<string, string> }> = () =
             <button key={e || 'todas'} type="button" className={estado === e ? 'is-on' : ''} onClick={() => setEstado(e)}>{e || 'Todas'}</button>
           ))}
         </div>
+        <div className="filter-select"><SelectorProspecto valor={prospecto} onChange={setProspecto} textoVacio="Todos los prospectos" /></div>
+        <label className="filter-group">Desde <input type="date" className="input select-filter" value={desde} onChange={(e) => setDesde(e.target.value)} /></label>
+        <label className="filter-group">Hasta <input type="date" className="input select-filter" value={hasta} onChange={(e) => setHasta(e.target.value)} /></label>
       </div>
       {error && <ErrorCarga mensaje={error} onReintentar={recargar} />}
       {cargando && !datos ? <Cargando /> : datos?.length === 0 ? <Vacio texto="No hay propuestas con ese filtro." /> : (

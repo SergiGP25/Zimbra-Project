@@ -6,6 +6,7 @@ import { useInactivityTimer } from './hooks/auth/useInactivityTimer'
 import { navegar, useRuta } from './router/router'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
+import { MiPruebaPage } from './pages/MiPruebaPage'
 import { AppLayout } from './components/layout/AppLayout'
 
 /*
@@ -14,6 +15,7 @@ import { AppLayout } from './components/layout/AppLayout'
     /login       -> página de inicio de sesión
     /recuperar   -> pedir enlace para restablecer la contraseña
     /restablecer -> crear contraseña nueva (enlace del correo)
+    /mi-prueba   -> página personal del visitante con su prueba (enlace del correo)
     /app/...     -> sistema interno (exige sesión)
   Si alguien entra a /app sin sesión, va a /login; si ya inició sesión y
   abre /login, va a /app.
@@ -38,6 +40,7 @@ const Rutas: React.FC = () => {
   if (ruta === '/login') return isAuthenticated ? null : <LoginPage />
   if (ruta === '/recuperar') return <LoginPage vista="recuperar" />
   if (ruta === '/restablecer') return <LoginPage vista="restablecer" />
+  if (ruta === '/mi-prueba') return <MiPruebaPage />
   return <LandingPage />
 }
 

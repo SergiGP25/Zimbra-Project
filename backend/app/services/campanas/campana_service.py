@@ -13,9 +13,10 @@ class CampanaService:
     def __init__(self, repo=None):
         self.repo = repo or campana_repository
 
-    def listar(self, db: Optional[Session], canal: Optional[str], solo_vigentes: bool) -> CampanaListResponse:
+    def listar(self, db: Optional[Session], canal: Optional[str], solo_vigentes: bool,
+               desde=None, hasta=None) -> CampanaListResponse:
         db = exigir_db(db)
-        filas = self.repo.listar(db, canal, solo_vigentes)
+        filas = self.repo.listar(db, canal, solo_vigentes, desde, hasta)
         return CampanaListResponse(total=len(filas), campanas=[CampanaResponse(**f) for f in filas])
 
     def crear(self, datos: CampanaCreate, db: Optional[Session]) -> CampanaResponse:

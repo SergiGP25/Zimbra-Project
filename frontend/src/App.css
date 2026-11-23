@@ -532,6 +532,9 @@
   gap: 0.5rem;
 }
 
+/* Selector de prospecto dentro de una barra de filtros */
+.filter-select { min-width: 220px; max-width: 320px; }
+
 .filter-group label {
   font-size: 0.88rem;
   color: var(--ink-soft);

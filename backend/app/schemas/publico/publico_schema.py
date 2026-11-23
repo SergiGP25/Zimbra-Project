@@ -1,6 +1,6 @@
 import re
 from datetime import date
-from typing import Optional
+from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
 _PATRON_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -11,6 +11,7 @@ class ProductoGratuito(BaseModel):
 
     producto_id: int
     nombre: str
+    descripcion: Optional[str] = None
     version: str
 
 
@@ -60,3 +61,34 @@ class PruebaRegistrada(BaseModel):
     fecha_fin: date
     mensaje: str
     prospecto_nuevo: bool = False  # True si el correo no estaba registrado
+
+
+class PruebaPortal(BaseModel):
+    producto: str
+    descripcion: Optional[str] = None
+    fecha_inicio: date
+    fecha_fin: date
+    estado: str
+    dias_restantes: int
+
+
+class PortalPrueba(BaseModel):
+    """Lo que ve el visitante en "Mi prueba" (enlace del correo)."""
+
+    nombre: str
+    empresa: Optional[str] = None
+    asesor: Optional[str] = None
+    asesor_email: Optional[str] = None
+    pruebas: List[PruebaPortal]
+
+
+class VisitaPortal(BaseModel):
+    """El visitante abre una sección del portal: cuenta como visita web (T2)."""
+
+    token: str = Field(..., min_length=10)
+    pagina: Literal["/precios", "/caracteristicas", "/soporte"]
+
+
+class VisitaPortalRegistrada(BaseModel):
+    registrada: bool   # False si ya la había visitado hoy
+    mensaje: str

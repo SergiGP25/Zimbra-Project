@@ -16,10 +16,10 @@ def panel(usuario: Dict = Depends(get_current_user), db: Optional[Session] = Dep
     return reporte_service.panel(db, usuario)
 
 
-@router.get("/ventas-mensual", summary="R-01: ventas del mes por vendedor (RF-41)")
+@router.get("/ventas-mensual", summary="R-01: ventas del mes por vendedor (RF-41); el vendedor ve solo su fila")
 def ventas_mensual(anio: int = Query(..., ge=2000, le=2100), mes: int = Query(..., ge=1, le=12),
-                   _u=gerencia, db: Optional[Session] = Depends(get_db)):
-    return reporte_service.ventas_mensual(db, anio, mes)
+                   usuario: Dict = Depends(get_current_user), db: Optional[Session] = Depends(get_db)):
+    return reporte_service.ventas_mensual(db, anio, mes, usuario)
 
 
 @router.get("/resumen-anual", summary="R-02: indicadores mes a mes")

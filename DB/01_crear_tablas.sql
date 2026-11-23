@@ -55,6 +55,7 @@ CREATE TABLE campana (
 CREATE TABLE producto (
     producto_id      INT           NOT NULL AUTO_INCREMENT,
     nombre           VARCHAR(100)  NOT NULL,
+    descripcion      VARCHAR(255)  NULL,      -- qué es y para qué sirve (se muestra al visitante)
     version          VARCHAR(20)   NOT NULL,
     precio_unitario  DECIMAL(12,2) NOT NULL DEFAULT 0,
     activo           BOOLEAN       NOT NULL DEFAULT TRUE,

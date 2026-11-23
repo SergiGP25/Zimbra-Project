@@ -6,6 +6,7 @@ Version = Literal["Gratuita", "Comercial"]
 
 class ProductoCreate(BaseModel):
     nombre: str = Field(..., min_length=2, max_length=100)
+    descripcion: Optional[str] = Field(None, max_length=255)
     version: Version
     precio_unitario: float = Field(0, ge=0)
 
@@ -22,12 +23,14 @@ class ProductoCreate(BaseModel):
 class ProductoUpdate(BaseModel):
     # Todos opcionales: solo se cambia lo que se envía
     nombre: Optional[str] = Field(None, min_length=2, max_length=100)
+    descripcion: Optional[str] = Field(None, max_length=255)
     precio_unitario: Optional[float] = Field(None, ge=0)
 
 
 class ProductoResponse(BaseModel):
     producto_id: int
     nombre: str
+    descripcion: Optional[str] = None
     version: str
     precio_unitario: float
     activo: bool

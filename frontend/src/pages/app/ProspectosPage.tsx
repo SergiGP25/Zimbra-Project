@@ -21,7 +21,7 @@ export const ProspectosPage: React.FC<{ params: Record<string, string> }> = () =
   const esVendedor = user?.rol === 'Vendedor'
   const inicial = new URLSearchParams(window.location.search)   // ej. /app/prospectos?estado=Calificado
   const [filtros, setFiltros] = useState({
-    q: '', estado: inicial.get('estado') || '', campana_id: '', vendedor_id: '', sin_vendedor: false, orden: 'puntaje', pagina: 1,
+    q: '', estado: inicial.get('estado') || '', campana_id: inicial.get('campana_id') || '', vendedor_id: '', sin_vendedor: false, orden: 'puntaje', pagina: 1,
   })
   const [busqueda, setBusqueda] = useState('')
   const [ventana, setVentana] = useState<Ventana>(null)

@@ -75,7 +75,10 @@ export const TrialSection: React.FC = () => {
             <dd>{new Date(resultado.fecha_fin + 'T00:00').toLocaleDateString('es-CO')}</dd>
           </div>
         </dl>
-        <p className="text-muted">Un asesor te escribirá a {form.email} para ayudarte a empezar.</p>
+        <p>
+          Te enviamos un correo a <strong>{form.email}</strong> con el enlace a tu página <strong>Mi prueba</strong>:
+          ahí ves cuántos días te quedan, cómo empezar y quién es tu asesor. No necesitas usuario ni contraseña.
+        </p>
         <button
           type="button"
           className="btn btn-secondary"
@@ -94,6 +97,7 @@ export const TrialSection: React.FC = () => {
     <form className="trial-form" onSubmit={handleSubmit}>
       <fieldset className="product-picker">
         <legend>¿Qué quieres probar?</legend>
+        <p className="picker-help">Cada opción es una parte de Zimbra. Elige una; después puedes probar otras con el mismo correo.</p>
         {cargandoProductos && <p className="text-muted">Cargando productos…</p>}
         {!cargandoProductos && productos.length === 0 && !error && (
           <p className="text-muted">No hay productos disponibles para prueba en este momento.</p>
@@ -111,7 +115,10 @@ export const TrialSection: React.FC = () => {
                 checked={form.producto_id === p.producto_id}
                 onChange={() => setForm((f) => ({ ...f, producto_id: p.producto_id }))}
               />
-              <span>{p.nombre}</span>
+              <span className="product-option-text">
+                <span className="product-option-name">{p.nombre}</span>
+                {p.descripcion && <span className="product-option-desc">{p.descripcion}</span>}
+              </span>
             </label>
           ))}
         </div>

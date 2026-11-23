@@ -1,30 +1,37 @@
 import React, { useState } from 'react'
+import { useAuth } from '../../hooks/auth/useAuth'
 import { useCarga } from '../../lib/useCarga'
 import { descargarCSV, formatoMoneda } from '../../lib/formato'
 import { reporteService } from '../../services/crm/crmService'
-import { Cargando, Encabezado, ErrorCarga, Indicador, Vacio } from '../../components/ui/ui'
+import { Cargando, Encabezado, ErrorCarga, Indicador, SelectorVendedor, Vacio } from '../../components/ui/ui'
 
 /*
   RF-40 a RF-46. Cada pestaña llama un endpoint que ejecuta un procedimiento
   almacenado de 07_reportes.sql (R-01 a R-06). La pantalla solo pide y dibuja:
   los cálculos los hace MySQL. Cada tabla se puede exportar a CSV (RF-45).
+  El vendedor ve solo dos pestañas y solo sus datos (HU-37, RN-12): sus
+  ventas del mes y su embudo. El servidor filtra; la pantalla no decide.
 */
 const PESTANAS = [
-  { id: 'mensual', texto: 'Ventas del mes' },
-  { id: 'anual', texto: 'Resumen anual' },
-  { id: 'conversion', texto: 'Conversión' },
-  { id: 'campanas', texto: 'Campañas' },
-  { id: 'cierre', texto: 'Tasa de cierre' },
-  { id: 'vistas', texto: 'Vistas SQL' },
+  { id: 'mensual', texto: 'Ventas del mes', vendedor: true },
+  { id: 'embudo', texto: 'Embudo', vendedor: true },
+  { id: 'anual', texto: 'Resumen anual', vendedor: false },
+  { id: 'conversion', texto: 'Conversión', vendedor: false },
+  { id: 'campanas', texto: 'Campañas', vendedor: false },
+  { id: 'cierre', texto: 'Tasa de cierre', vendedor: false },
+  { id: 'vistas', texto: 'Vistas SQL', vendedor: false },
 ] as const
 type Pestana = typeof PESTANAS[number]['id']
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
 export const ReportesPage: React.FC<{ params: Record<string, string> }> = () => {
+  const { user } = useAuth()
+  const esVendedor = user?.rol === 'Vendedor'
   const hoy = new Date()
   const [pestana, setPestana] = useState<Pestana>('mensual')
   const [anio, setAnio] = useState(hoy.getFullYear())
-  const [mes, setMes] = useState(6)
+  const [mes, setMes] = useState(hoy.getMonth() + 1)
+  const [vendedor, setVendedor] = useState('')
   const [desde, setDesde] = useState(`${hoy.getFullYear()}-01-01`)
   const [hasta, setHasta] = useState(`${hoy.getFullYear()}-12-31`)
 
@@ -32,9 +39,9 @@ export const ReportesPage: React.FC<{ params: Record<string, string> }> = () => 
 
   return (
     <div>
-      <Encabezado titulo="Reportes" descripcion="Indicadores calculados por procedimientos almacenados en MySQL." />
+      <Encabezado titulo="Reportes" descripcion={esVendedor ? 'Tus ventas y tu embudo de prospectos.' : 'Indicadores calculados por procedimientos almacenados en MySQL.'} />
       <div className="tabs" role="tablist">
-        {PESTANAS.map((p) => (
+        {PESTANAS.filter((p) => !esVendedor || p.vendedor).map((p) => (
           <button key={p.id} role="tab" aria-selected={pestana === p.id} className={pestana === p.id ? 'is-on' : ''} onClick={() => setPestana(p.id)}>{p.texto}</button>
         ))}
       </div>
@@ -56,9 +63,12 @@ export const ReportesPage: React.FC<{ params: Record<string, string> }> = () => 
             <label className="filter-group">Hasta <input type="date" className="input select-filter" value={hasta} onChange={(e) => setHasta(e.target.value)} /></label>
           </>
         )}
+        {/* HU-39: Admin y Marketing filtran el embudo por vendedor; el vendedor ya ve solo el suyo */}
+        {pestana === 'embudo' && !esVendedor && <SelectorVendedor valor={vendedor} onChange={setVendedor} />}
       </div>
 
-      {pestana === 'mensual' && <VentasMensual anio={anio} mes={mes} />}
+      {pestana === 'mensual' && <VentasMensual anio={anio} mes={mes} esVendedor={esVendedor} />}
+      {pestana === 'embudo' && <Embudo vendedorId={vendedor ? Number(vendedor) : undefined} />}
       {pestana === 'anual' && <ResumenAnual anio={anio} />}
       {pestana === 'conversion' && <Conversion desde={desde} hasta={hasta} />}
       {pestana === 'campanas' && <Campanas desde={desde} hasta={hasta} />}
@@ -68,7 +78,20 @@ export const ReportesPage: React.FC<{ params: Record<string, string> }> = () => 
   )
 }
 
-const VentasMensual: React.FC<{ anio: number; mes: number }> = ({ anio, mes }) => {
+const Embudo: React.FC<{ vendedorId?: number }> = ({ vendedorId }) => {
+  const { datos, cargando, error, recargar } = useCarga(() => reporteService.embudo(vendedorId), [vendedorId])
+  if (cargando) return <Cargando />
+  if (error || !datos) return <ErrorCarga mensaje={error || 'Sin datos'} onReintentar={recargar} />
+  return (
+    <>
+      <GraficoBarras titulo="Prospectos por estado" filas={datos.map((e) => ({ etiqueta: String(e.estado), valor: Number(e.prospectos) }))} formato={(n) => String(n)} />
+      <TablaReporte titulo="Embudo de prospectos" archivo={`embudo${vendedorId ? '-vendedor-' + vendedorId : ''}`} filas={datos}
+        columnas={[['estado', 'Estado'], ['prospectos', 'Prospectos'], ['pct_total', '% del total', 'pct']]} vacio="No hay prospectos para este filtro." />
+    </>
+  )
+}
+
+const VentasMensual: React.FC<{ anio: number; mes: number; esVendedor: boolean }> = ({ anio, mes, esVendedor }) => {
   const { datos, cargando, error, recargar } = useCarga(() => reporteService.ventasMensual(anio, mes), [anio, mes])
   if (cargando) return <Cargando />
   if (error || !datos) return <ErrorCarga mensaje={error || 'Sin datos'} onReintentar={recargar} />
@@ -76,15 +99,15 @@ const VentasMensual: React.FC<{ anio: number; mes: number }> = ({ anio, mes }) =
   return (
     <>
       <div className="kpi-grid">
-        <Indicador etiqueta="Ventas del mes" valor={t.num_ventas ?? 0} />
-        <Indicador etiqueta="Monto" valor={formatoMoneda(t.monto_total)} destacado />
-        <Indicador etiqueta="Pagadas" valor={Number(t.pagadas ?? 0)} />
-        <Indicador etiqueta="Pendientes de pago" valor={Number(t.pendientes ?? 0)} />
+        <Indicador etiqueta={esVendedor ? 'Tus ventas del mes' : 'Ventas del mes'} valor={t.num_ventas ?? 0} />
+        <Indicador etiqueta={esVendedor ? 'Tu monto' : 'Monto'} valor={formatoMoneda(t.monto_total)} destacado />
+        {!esVendedor && <Indicador etiqueta="Pagadas" valor={Number(t.pagadas ?? 0)} />}
+        {!esVendedor && <Indicador etiqueta="Pendientes de pago" valor={Number(t.pendientes ?? 0)} />}
       </div>
-      <GraficoBarras titulo="Monto vendido por vendedor" filas={datos.detalle.map((d) => ({ etiqueta: String(d.vendedor), valor: Number(d.monto_total) }))} formato={formatoMoneda} />
+      {!esVendedor && <GraficoBarras titulo="Monto vendido por vendedor" filas={datos.detalle.map((d) => ({ etiqueta: String(d.vendedor), valor: Number(d.monto_total) }))} formato={formatoMoneda} />}
       <TablaReporte titulo={`Ventas por vendedor, ${MESES[mes - 1].toLowerCase()} de ${anio}`} archivo={`ventas-${anio}-${mes}`} filas={datos.detalle}
         columnas={[['vendedor', 'Vendedor'], ['num_ventas', 'Ventas'], ['monto_total', 'Monto', 'moneda'], ['ticket_promedio', 'Ticket promedio', 'moneda'], ['pct_del_mes', '% del mes', 'pct']]}
-        vacio="No hubo ventas en ese mes. Prueba con junio de 2026, que tiene datos de ejemplo." />
+        vacio={esVendedor ? 'No tienes ventas en ese mes.' : 'No hubo ventas en ese mes. Prueba con otro mes: los datos de ejemplo van de enero a junio de 2026, y los de demostración son recientes.'} />
     </>
   )
 }

@@ -146,6 +146,7 @@ frontend/src/
 | `/` | Sitio público: producto, planes, prueba gratis, preguntas | Todos |
 | `/login` | Inicio de sesión | Sin sesión |
 | `/recuperar`, `/restablecer?token=…` | ¿Olvidaste tu contraseña? y contraseña nueva desde el correo | Sin sesión |
+| `/mi-prueba?token=…` | Página personal del visitante: días restantes, cómo empezar, su asesor | Visitante (enlace del correo) |
 | `/app` | Panel con indicadores y embudo | Todos |
 | `/app/alertas` | Bandeja de alertas | Todos (vendedor: las suyas) |
 | `/app/prospectos` y `/app/prospectos/:id` | Listado y ficha | Todos |
@@ -153,7 +154,7 @@ frontend/src/
 | `/app/pruebas` | Pruebas gratuitas | Todos |
 | `/app/visitas` | Simulador de visitas | Admin y Marketing registran |
 | `/app/interacciones`, `/app/propuestas`, `/app/ventas` | Proceso comercial | Todos |
-| `/app/reportes` | Reportes R-01 a R-06 con exportación CSV | Admin, Marketing |
+| `/app/reportes` | Reportes R-01 a R-06 con exportación CSV | Admin, Marketing; el Vendedor ve sus ventas y su embudo |
 | `/app/productos`, `/app/empleados` | Administración | Admin edita |
 
 ---
@@ -179,11 +180,17 @@ El backend envía cuatro correos, siempre en segundo plano (`BackgroundTasks`): 
 | Evento | Correo | Dónde se programa |
 |---|---|---|
 | Registro desde el sitio público | Bienvenida | `api/v1/publico/publico_router.py` |
-| Prueba activada (sitio o CRM) | Producto, inicio y fin de la prueba | `publico_router.py` y `pruebas/prueba_router.py` |
+| Prueba activada (sitio o CRM) | Producto, inicio, fin y el enlace a «Mi prueba» | `publico_router.py` y `pruebas/prueba_router.py` |
 | ¿Olvidaste tu contraseña? | Enlace firmado que vence en 30 minutos | `auth/auth_router.py` |
 | Contraseña cambiada o restablecida | Aviso de seguridad | `auth/auth_router.py` |
 
 El enlace de recuperación es un JWT con `tipo = "restablecer"` y una *huella* del hash de la contraseña. Sirve una sola vez, porque al cambiar la contraseña la huella deja de coincidir, y no abre ninguna ruta protegida, porque `get_current_user` rechaza los tokens con `tipo`. Si el correo no existe, la API responde el mismo mensaje, para que nadie averigüe qué cuentas hay.
+
+### Cómo entra el visitante: «Mi prueba»
+
+El visitante no es usuario del CRM. El CRM es del equipo comercial; el visitante prueba el producto Zimbra. Para que tenga dónde ver su prueba, el correo de «prueba activada» trae un enlace personal `/mi-prueba?token=…`. Es un JWT con `tipo = "portal"` que dura 120 días y no abre el CRM.
+
+Esa página también alimenta el caso: abrirla (`GET /publico/mi-prueba`) y pulsar *Ver planes y precios* o *Ver qué incluye Zimbra* (`POST /publico/mi-prueba/visita`) registran visitas web con la misma transacción T2 del simulador. Así se reproduce el rastreo web del caso. Cada página cuenta una vez al día por visitante, para que recargar no infle el puntaje.
 
 Modos de envío (`CORREO_MODO`): `consola` (solo log), `smtp` (Mailpit en local) y `brevo` (API HTTPS, para la nube).
 

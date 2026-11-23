@@ -90,7 +90,7 @@ El recorrido de una petición y la explicación de cada módulo están en [docs/
 | Cuándo | A quién |
 | --- | --- |
 | Un visitante se registra desde el sitio | Bienvenida al visitante |
-| Se activa una prueba (sitio público o desde el CRM) | Datos de la prueba: producto, inicio y fin |
+| Se activa una prueba (sitio público o desde el CRM) | Datos de la prueba y el enlace a su página «Mi prueba» (sin contraseña) |
 | "¿Olvidaste tu contraseña?" en `/login` | Enlace para crear una nueva (vence en 30 minutos y sirve una vez) |
 | Se cambia o restablece una contraseña | Aviso de seguridad al dueño de la cuenta |
 

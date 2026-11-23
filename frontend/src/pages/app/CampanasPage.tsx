@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../../hooks/auth/useAuth'
 import { useCarga } from '../../lib/useCarga'
+import { Enlace } from '../../router/router'
 import { formatoFecha, formatoMoneda, hoyISO } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { campanaService } from '../../services/crm/crmService'
@@ -11,9 +12,11 @@ import { Aviso, Cargando, Encabezado, ErrorCarga, Modal, Vacio, Paginacion, useP
 export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => {
   const { user } = useAuth()
   const [canal, setCanal] = useState('')
+  const [desde, setDesde] = useState('')   // HU-13: campañas activas en algún día del rango
+  const [hasta, setHasta] = useState('')
   const [editando, setEditando] = useState<Campana | 'nueva' | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
-  const { datos, cargando, error, recargar } = useCarga(() => campanaService.listar({ canal }), [canal])
+  const { datos, cargando, error, recargar } = useCarga(() => campanaService.listar({ canal, desde, hasta }), [canal, desde, hasta])
   const pag = usePaginacion(datos?.campanas)
 
   return (
@@ -28,6 +31,9 @@ export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => 
             <button key={c || 'todos'} type="button" className={canal === c ? 'is-on' : ''} onClick={() => setCanal(c)}>{c || 'Todos los canales'}</button>
           ))}
         </div>
+        <label className="filter-group">Activas desde <input type="date" className="input select-filter" value={desde} onChange={(e) => setDesde(e.target.value)} /></label>
+        <label className="filter-group">hasta <input type="date" className="input select-filter" value={hasta} onChange={(e) => setHasta(e.target.value)} /></label>
+        {(desde || hasta) && <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setDesde(''); setHasta('') }}>Quitar fechas</button>}
       </div>
       {error && <ErrorCarga mensaje={error} onReintentar={recargar} />}
       {cargando && !datos ? <Cargando /> : datos?.campanas.length === 0 ? <Vacio texto="No hay campañas." /> : (
@@ -41,7 +47,10 @@ export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => 
                   <td>{c.canal}</td>
                   <td className="cell-sub">{formatoFecha(c.fecha_inicio)} a {c.fecha_fin ? formatoFecha(c.fecha_fin) : 'sin fin'}</td>
                   <td className="num">{formatoMoneda(c.presupuesto)}</td>
-                  <td className="num">{c.prospectos}</td>
+                  <td className="num">
+                    {/* HU-14: abre Prospectos ya filtrado por esta campaña */}
+                    <Enlace to={`/app/prospectos?campana_id=${c.campana_id}`} title={`Ver los prospectos de ${c.nombre}`}>{c.prospectos}</Enlace>
+                  </td>
                   <td className="num">{c.pruebas}</td>
                   <td className="num">{c.ventas}</td>
                   <td className="num strong">{formatoMoneda(c.monto_vendido)}</td>

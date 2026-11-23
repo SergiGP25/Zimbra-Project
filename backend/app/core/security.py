@@ -61,6 +61,18 @@ def crear_token_restablecer(empleado_id: int, password_hash: str, minutos: int) 
     )
 
 
+def crear_token_portal(prospecto_id: int, dias: int = 120) -> str:
+    """
+    Enlace personal del visitante a "Mi prueba". No lleva contraseña: quien
+    tiene el enlace (que solo llegó a su correo) ve el estado de SU prueba.
+    No abre el CRM: get_current_user rechaza los tokens con "tipo".
+    """
+    return create_access_token(
+        {"sub": str(prospecto_id), "tipo": "portal"},
+        expires_delta=timedelta(days=dias),
+    )
+
+
 def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
     """
     Decodifica y valida la firma y expiración del token JWT.

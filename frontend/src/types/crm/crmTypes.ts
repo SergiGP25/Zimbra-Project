@@ -6,6 +6,7 @@ export type EstadoProspecto = 'Nuevo' | 'En prueba' | 'Calificado' | 'Cliente' |
 export interface Producto {
   producto_id: number
   nombre: string
+  descripcion: string | null
   version: 'Gratuita' | 'Comercial'
   precio_unitario: number
   activo: boolean

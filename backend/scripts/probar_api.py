@@ -13,6 +13,7 @@ RN-07, RN-09, RN-12) para comprobar que el sistema los rechaza.
 Cada línea muestra OK o FALLA. Al final, el total.
 Ojo: crea datos nuevos en la base (un prospecto con correo único por ejecución).
 """
+import re
 import sys
 import time
 
@@ -53,6 +54,20 @@ def correos_para(destino):
         return None
 
 
+def token_del_correo(destino, ruta):
+    """Busca en Mailpit el enlace /ruta?token=... del correo más reciente para ese destinatario."""
+    try:
+        mensajes = requests.get(f"{MAILPIT}/search", params={"query": f"to:{destino}"}, timeout=5).json().get("messages", [])
+        for m in mensajes:
+            texto = requests.get(f"{MAILPIT}/message/{m['ID']}", timeout=5).json().get("Text", "")
+            encontrado = re.search(rf"{ruta}\?token=([\w\-\.]+)", texto)
+            if encontrado:
+                return encontrado.group(1)
+    except Exception:
+        pass
+    return None
+
+
 def main():
     print("\n1. Conexión")
     salud = revisar("GET /health", requests.get(f"{API}/health"), 200)
@@ -63,7 +78,7 @@ def main():
     vendedor = entrar("carlos.salazar6@zimbra-demo.com")
 
     print("\n2. Consultas de cada módulo (Admin)")
-    for ruta in ["/productos/", "/campanas/", "/prospectos/", "/prospectos/catalogos", "/pruebas/", "/visitas/",
+    for ruta in ["/productos/", "/campanas/", "/campanas/?desde=2026-01-01&hasta=2026-03-31", "/prospectos/", "/prospectos/catalogos", "/pruebas/", "/visitas/",
                  "/alertas/", "/interacciones/", "/propuestas/", "/ventas/", "/reportes/panel",
                  "/reportes/resumen-anual?anio=2026", "/reportes/ventas-mensual?anio=2026&mes=6",
                  "/reportes/conversion", "/reportes/campanas", "/reportes/embudo", "/reportes/tasa-cierre"]:
@@ -72,6 +87,9 @@ def main():
     print("\n3. Permisos por rol (RN-12, HU-04)")
     revisar("Vendedor no puede ver empleados", requests.get(f"{API}/empleados/", headers=vendedor), 403)
     revisar("Vendedor no puede ver reportes de gerencia", requests.get(f"{API}/reportes/campanas", headers=vendedor), 403)
+    propio = revisar("Vendedor ve su fila en ventas del mes (HU-37)", requests.get(
+        f"{API}/reportes/ventas-mensual?anio=2026&mes=6", headers=vendedor), 200)
+    resultados.append(all(f.get("empleado_id") == 6 for f in propio["detalle"]))
     lista = requests.get(f"{API}/prospectos/?por_pagina=100", headers=vendedor).json()["prospectos"]
     print(f"     el vendedor 6 ve {len(lista)} prospectos; todos suyos: {all(p['empleado_id'] == 6 for p in lista)}")
     resultados.append(all(p["empleado_id"] == 6 for p in lista))
@@ -149,6 +167,19 @@ def main():
         ok = any("Restablece" in a for a in (correos_para("camila.rojas1@zimbra-demo.com") or []))
         print(f"  {'OK   ' if ok else 'FALLA'} Llegó el enlace para restablecer la contraseña")
         resultados.append(ok)
+
+        print("\n7. Portal «Mi prueba» del visitante (enlace del correo)")
+        token = token_del_correo(visitante, "/mi-prueba")
+        print(f"  {'OK   ' if token else 'FALLA'} El correo de la prueba trae el enlace personal")
+        resultados.append(bool(token))
+        if token:
+            portal = revisar("Abrir Mi prueba con el enlace", requests.get(f"{API}/publico/mi-prueba", params={"token": token}), 200)
+            print(f"     {portal['nombre']}: {len(portal['pruebas'])} prueba(s), {portal['pruebas'][0]['dias_restantes']} días restantes")
+            revisar("Ver precios desde el portal (visita T2)", requests.post(f"{API}/publico/mi-prueba/visita",
+                                                                        json={"token": token, "pagina": "/precios"}), 200)
+            revisar("El enlace del portal no abre el CRM", requests.get(f"{API}/auth/me",
+                                                                     headers={"Authorization": f"Bearer {token}"}), 401)
+        revisar("Enlace de portal falso rechazado", requests.get(f"{API}/publico/mi-prueba", params={"token": "falso-falso-falso"}), 400)
 
     total, buenos = len(resultados), sum(resultados)
     print(f"\nResultado: {buenos} de {total} comprobaciones correctas.")

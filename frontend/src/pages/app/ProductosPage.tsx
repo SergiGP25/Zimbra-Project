@@ -44,7 +44,10 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
             <tbody>
               {pag.visibles.map((p) => (
                 <tr key={p.producto_id} className={p.activo ? '' : 'row-inactive'}>
-                  <td className="cell-title">{p.nombre}</td>
+                  <td>
+                    <div className="cell-title">{p.nombre}</div>
+                    {p.descripcion && <div className="cell-sub">{p.descripcion}</div>}
+                  </td>
                   <td>{p.version}</td>
                   <td className="num">{p.version === 'Gratuita' ? 'Gratis' : formatoMoneda(p.precio_unitario)}</td>
                   <td className="num">{p.pruebas}</td>
@@ -71,6 +74,7 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
 
 const FormProducto: React.FC<{ producto?: Producto; onClose: () => void; onGuardado: (m: string) => void }> = ({ producto, onClose, onGuardado }) => {
   const [nombre, setNombre] = useState(producto?.nombre || '')
+  const [descripcion, setDescripcion] = useState(producto?.descripcion || '')
   const [version, setVersion] = useState<'Gratuita' | 'Comercial'>(producto?.version || 'Comercial')
   const [precio, setPrecio] = useState(producto ? Number(producto.precio_unitario) : 50000)
   const [error, setError] = useState<string | null>(null)
@@ -80,8 +84,8 @@ const FormProducto: React.FC<{ producto?: Producto; onClose: () => void; onGuard
     setError(null)
     try {
       const precioFinal = version === 'Gratuita' ? 0 : precio
-      if (producto) await productoService.editar(producto.producto_id, { nombre, precio_unitario: precioFinal })
-      else await productoService.crear({ nombre, version, precio_unitario: precioFinal })
+      if (producto) await productoService.editar(producto.producto_id, { nombre, descripcion, precio_unitario: precioFinal })
+      else await productoService.crear({ nombre, descripcion, version, precio_unitario: precioFinal })
       onGuardado(producto ? 'Producto actualizado.' : 'Producto creado.')
     } catch (err: any) {
       setError(err.detail || 'No se pudo guardar.')
@@ -94,6 +98,9 @@ const FormProducto: React.FC<{ producto?: Producto; onClose: () => void; onGuard
         {error && <div className="alert alert-error" role="alert">{error}</div>}
         <div className="form-group"><label htmlFor="pr-nombre">Nombre</label>
           <input id="pr-nombre" className="input" value={nombre} onChange={(e) => setNombre(e.target.value)} required minLength={2} /></div>
+        <div className="form-group"><label htmlFor="pr-descripcion">Descripción <span className="optional">(la ve el visitante al elegir su prueba)</span></label>
+          <textarea id="pr-descripcion" className="input" rows={2} maxLength={255} value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)} placeholder="Qué es y para qué sirve, en una o dos frases" /></div>
         <div className="form-grid-2">
           <div className="form-group"><label htmlFor="pr-version">Versión</label>
             <select id="pr-version" className="input" value={version} disabled={!!producto} onChange={(e) => setVersion(e.target.value as 'Gratuita' | 'Comercial')}>

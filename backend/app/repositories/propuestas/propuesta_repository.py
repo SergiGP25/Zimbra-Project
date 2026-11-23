@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict, List, Optional
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -17,15 +18,19 @@ _SELECT = """
 
 class PropuestaRepository:
     def listar(self, db: Session, estado: Optional[str], prospecto_id: Optional[int],
-               vendedor_id: Optional[int], sin_venta: bool) -> List[Dict[str, Any]]:
+               vendedor_id: Optional[int], sin_venta: bool,
+               desde: Optional[date] = None, hasta: Optional[date] = None) -> List[Dict[str, Any]]:
         sql = _SELECT + """
              WHERE (:estado IS NULL OR pp.estado = :estado)
                AND (:prospecto IS NULL OR pp.prospecto_id = :prospecto)
                AND (:vendedor IS NULL OR pp.empleado_id = :vendedor)
                AND (:sin_venta = 0 OR v.venta_id IS NULL)
+               AND (:desde IS NULL OR pp.fecha_emision >= :desde)
+               AND (:hasta IS NULL OR pp.fecha_emision <= :hasta)
              ORDER BY pp.fecha_emision DESC, pp.propuesta_id DESC
         """
-        params = {"estado": estado, "prospecto": prospecto_id, "vendedor": vendedor_id, "sin_venta": int(sin_venta)}
+        params = {"estado": estado, "prospecto": prospecto_id, "vendedor": vendedor_id, "sin_venta": int(sin_venta),
+                  "desde": desde, "hasta": hasta}
         return [dict(f) for f in db.execute(text(sql), params).mappings().all()]
 
     def obtener(self, db: Session, propuesta_id: int) -> Optional[Dict[str, Any]]:

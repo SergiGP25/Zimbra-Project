@@ -11,11 +11,12 @@ from app.services.prospectos.prospecto_service import prospecto_service
 class PropuestaService:
     """Propuestas comerciales (RF-32 a RF-35)."""
 
-    def listar(self, db: Optional[Session], usuario: Dict[str, Any], estado, prospecto_id, vendedor_id, sin_venta: bool):
+    def listar(self, db: Optional[Session], usuario: Dict[str, Any], estado, prospecto_id, vendedor_id, sin_venta: bool,
+               desde=None, hasta=None):
         db = exigir_db(db)
         if es_vendedor(usuario):
             vendedor_id = usuario["id"]      # RN-12
-        return propuesta_repository.listar(db, estado, prospecto_id, vendedor_id, sin_venta)
+        return propuesta_repository.listar(db, estado, prospecto_id, vendedor_id, sin_venta, desde, hasta)
 
     def crear(self, datos: PropuestaCreate, usuario: Dict[str, Any], db: Optional[Session]) -> Dict[str, Any]:
         db = exigir_db(db)

@@ -31,16 +31,64 @@ La sesión se cierra tras 30 minutos sin actividad.
 
 ## 3. Flujo de uso (paso a paso)
 
+El sistema tiene dos tipos de personas:
+
+- **Visitantes:** prueban Zimbra. No tienen usuario: se registran en el sitio público y entran a su página «Mi prueba» con el enlace que les llega por correo.
+- **Equipo comercial:** Admin, Marketing y Vendedor. Entran al CRM en `/login` con correo y contraseña.
+
+### 3.1 El visitante
+
+**Sitio público.** Explica el producto, los planes (en pesos colombianos) y las preguntas frecuentes.
+
+![Sitio público](img/01_inicio.png)
+
+**Activar la prueba.** El visitante elige qué probar; cada opción explica para qué sirve. Deja su nombre y su correo, y el sistema ejecuta la transacción T1: crea el prospecto, registra la prueba de 60 días y suma 20 puntos. Le llegan dos correos: bienvenida y prueba activada.
+
+![Formulario de prueba gratis](img/02_prueba_gratis.png)
+
+**Mi prueba.** El enlace del correo abre su página personal: días restantes, cómo empezar y quién es su asesor. Abrir la página y pulsar **Ver planes y precios** cuentan como visitas web (T2) y suben su puntaje. Cuando llega a 50 pasa a *Calificado*, y su vendedor recibe una alerta.
+
+![Mi prueba](img/03_mi_prueba.png)
+
+### 3.2 El equipo comercial
+
 1. **Iniciar sesión** con el correo y la contraseña. Un dato errado muestra «Correo o contraseña incorrectos». Si la olvidaste, **¿Olvidaste tu contraseña?** envía un enlace al correo de la cuenta (en local se ve en http://localhost:8025).
-2. **Prospectos → Nuevo prospecto.** Nombre, correo (único), empresa, teléfono y campaña de origen.
-3. **Pruebas gratuitas → Registrar descarga.** Elige un producto de versión Gratuita. Suma 20 puntos y el prospecto pasa a *En prueba*; la prueba dura 60 días calculados por la base de datos.
-4. **Visitas web → Simular visita.** Cada visita suma 5 puntos (+15 si es `/precios`). Al llegar a 50 puntos el prospecto es *Calificado*. Si ya está calificado y tiene vendedor, se crea una alerta (máximo una por hora).
-5. **Alertas.** El vendedor ve su bandeja y marca como atendida.
-6. **Interacciones.** Registrar llamada o correo; un resultado *Positivo* suma 10 puntos.
-7. **Propuestas.** Producto Comercial y número de licencias; el valor lo calcula la base de datos. Cambiar el estado a *Aceptada* o *Rechazada* (no se puede revertir).
-8. **Ventas → Registrar venta** desde una propuesta *Aceptada*. El prospecto pasa a *Cliente* y su prueba a *Convertida*. El Admin la marca *Pagada*.
-9. **Reportes** (Admin y Marketing): ventas mensuales, resumen anual, conversión, campañas, embudo y tasa de cierre. Cada tabla se exporta a CSV.
-10. **Panel de inicio:** indicadores según el rol.
+
+   ![Inicio de sesión](img/04_login.png)
+
+2. **Panel de inicio:** indicadores según el rol (RF-46).
+
+   ![Panel](img/05_panel.png)
+
+3. **Prospectos → Nuevo prospecto.** Nombre, correo (único), empresa, teléfono y campaña de origen. El listado busca por nombre, empresa o correo y filtra por estado, campaña y vendedor, de a 20 por página.
+
+   ![Prospectos](img/06_prospectos.png)
+
+4. **Ficha del prospecto.** Todo su historial en una pantalla: puntaje, pruebas, visitas, alertas, interacciones, propuestas y venta (RF-10).
+
+   ![Ficha del prospecto](img/07_ficha_prospecto.png)
+
+5. **Pruebas gratuitas → Registrar descarga.** Elige un producto de versión Gratuita. Suma 20 puntos y el prospecto pasa a *En prueba*; la prueba dura 60 días calculados por la base de datos. Un evento de MySQL vence cada noche las pruebas que terminaron.
+6. **Visitas web → Simular visita.** Cada visita suma 5 puntos (+15 si es `/precios`). Al llegar a 50 puntos el prospecto es *Calificado*. Si ya está calificado y tiene vendedor, se crea una alerta (máximo una por hora).
+
+   ![Simulador de visitas](img/08_visitas.png)
+
+7. **Alertas.** El vendedor ve su bandeja (las más recientes primero, con teléfono) y marca como atendida.
+
+   ![Alertas](img/09_alertas.png)
+
+8. **Interacciones.** Registrar llamada o correo; un resultado *Positivo* suma 10 puntos.
+9. **Propuestas.** Producto Comercial y número de licencias; el valor lo calcula la base de datos. Cambiar el estado a *Aceptada* o *Rechazada* (no se puede revertir). Filtros por estado, prospecto y fechas.
+
+   ![Propuestas](img/10_propuestas.png)
+
+10. **Ventas → Registrar venta** desde una propuesta *Aceptada*. El prospecto pasa a *Cliente* y su prueba a *Convertida*. El Admin la marca *Pagada*. Filtros por fechas, vendedor y estado de pago.
+
+    ![Ventas](img/11_ventas.png)
+
+11. **Reportes:** ventas del mes, embudo, resumen anual, conversión, campañas, tasa de cierre y vistas SQL. Cada tabla se exporta a CSV. El vendedor ve solo sus ventas y su embudo.
+
+    ![Reportes](img/12_reportes.png)
 
 ## 4. Mensajes de error frecuentes
 

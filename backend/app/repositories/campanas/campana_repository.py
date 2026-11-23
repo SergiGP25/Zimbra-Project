@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict, List, Optional
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -20,13 +21,19 @@ _SELECT = """
 
 
 class CampanaRepository:
-    def listar(self, db: Session, canal: Optional[str], solo_vigentes: bool) -> List[Dict[str, Any]]:
+    def listar(self, db: Session, canal: Optional[str], solo_vigentes: bool,
+               desde: Optional[date] = None, hasta: Optional[date] = None) -> List[Dict[str, Any]]:
+        # desde/hasta (HU-13): campañas que estuvieron activas en algún día del rango,
+        # es decir, que empezaron antes de que el rango termine y terminaron después de que empezó
         sql = _SELECT + """
              WHERE (:canal IS NULL OR c.canal = :canal)
                AND (:vigentes = 0 OR (c.fecha_inicio <= CURRENT_DATE AND (c.fecha_fin IS NULL OR c.fecha_fin >= CURRENT_DATE)))
+               AND (:hasta IS NULL OR c.fecha_inicio <= :hasta)
+               AND (:desde IS NULL OR c.fecha_fin IS NULL OR c.fecha_fin >= :desde)
              ORDER BY c.fecha_inicio DESC
         """
-        return [dict(f) for f in db.execute(text(sql), {"canal": canal, "vigentes": int(solo_vigentes)}).mappings().all()]
+        params = {"canal": canal, "vigentes": int(solo_vigentes), "desde": desde, "hasta": hasta}
+        return [dict(f) for f in db.execute(text(sql), params).mappings().all()]
 
     def obtener(self, db: Session, campana_id: int) -> Optional[Dict[str, Any]]:
         fila = db.execute(text(_SELECT + " WHERE c.campana_id = :id"), {"id": campana_id}).mappings().first()
