@@ -7,8 +7,8 @@ Al montar el sistema (`docker compose up -d --build` con volumen nuevo) MySQL ej
 | `02_insertar_datos.sql` | Datos base: 30 empleados, 30 campañas, 30 productos, 60 prospectos, 209 visitas, 51 pruebas, 83 interacciones, 43 alertas, 40 propuestas, 30 ventas (fecha de referencia 2026-11-04) |
 | `11_datos_demo.sql` | Datos **relativos a la fecha de hoy** para la demostración (abajo) |
 
-Si la base ya existía (volumen anterior): `.\DB\aplicar_datos_demo.ps1` (o `sh DB/aplicar_datos_demo.sh`). Es idempotente: si ya están, no repite nada.
-Para dejar todo como recién montado: `.\DB\reiniciar_demo.ps1` (borra la base y la recrea). Hacerlo antes de cada demostración y después de correr `DB/pruebas/`, que modifican datos.
+Si la base ya existía (volumen anterior): `.\DB\herramientas\aplicar_datos_demo.ps1` (o `sh DB/herramientas/aplicar_datos_demo.sh`). Es idempotente: si ya están, no repite nada.
+Para dejar todo como recién montado: `.\DB\herramientas\reiniciar_demo.ps1` (borra la base y la recrea). Hacerlo antes de cada demostración y después de correr `DB/pruebas/`, que modifican datos.
 
 ## Usuarios (contraseña `Zimbra2026*`)
 

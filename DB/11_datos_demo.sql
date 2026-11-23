@@ -16,7 +16,7 @@
 -- es el 6 (carlos.salazar6@zimbra-demo.com, clave Zimbra2026*).
 --
 -- Es IDEMPOTENTE: si ya fue aplicado no hace nada. Docker lo ejecuta solo
--- al crear el volumen; en una base ya creada, usar DB/aplicar_datos_demo.ps1
+-- al crear el volumen; en una base ya creada, usar DB/herramientas/aplicar_datos_demo.ps1
 -- (o .sh). Para borrar y recargar todo: docker compose down -v
 -- =====================================================================
 SET NAMES utf8mb4;

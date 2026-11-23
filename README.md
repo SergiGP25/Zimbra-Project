@@ -23,8 +23,7 @@ Zimbra-Project/
 │   ├── 09_indices.sql                # 10 índices adicionales
 │   ├── 10_roles_permisos.sql         # Roles y usuarios de MySQL (mínimo privilegio)
 │   ├── 11_datos_demo.sql             # Datos demo relativos a la fecha de hoy (idempotente)
-│   ├── aplicar_datos_demo.ps1/.sh    # Aplica los datos demo sobre una base ya creada
-│   ├── reiniciar_demo.ps1            # Borra y recrea la base lista para la demo
+│   ├── herramientas/                 # aplicar_datos_demo.ps1/.sh y reiniciar_demo.ps1 (fuera de la raiz: Docker ejecuta todo lo que hay en DB/)
 │   ├── pruebas/                      # 08 a 12 (ACID, carga, EXPLAIN, concurrencia, permisos); no se ejecutan solos
 │   └── respaldo/                     # respaldo y restauración (RNF-13)
 ├── docker-compose.yml                # Contenedor MySQL 8.0 en puerto 3307

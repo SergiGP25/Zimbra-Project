@@ -3,9 +3,9 @@
 # procedimientos, reportes, vistas, indices, roles y datos demo).
 # Usar antes de cada demostracion o despues de correr DB/pruebas (modifican datos).
 # ATENCION: borra TODOS los datos actuales de la base.
-# Uso:  .\DB\reiniciar_demo.ps1
+# Uso:  .\DB\herramientas\reiniciar_demo.ps1
 $ErrorActionPreference = "Stop"
-Set-Location (Join-Path $PSScriptRoot "..")
+Set-Location (Join-Path $PSScriptRoot "..\..")
 docker compose down -v
 docker compose up -d --build
 Write-Host "Esperando a MySQL (la primera carga tarda ~30 s)..."
