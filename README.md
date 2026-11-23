@@ -29,11 +29,20 @@ docker compose up --build
 | Bandeja de correos de prueba (Mailpit) | http://localhost:8025 |
 | MySQL desde tu PC | `localhost:3307`, usuario `root`, sin contraseña |
 
-La primera vez MySQL ejecuta solo los scripts `DB/01` a `DB/12` (tablas, datos, triggers, procedimientos, reportes, vistas, índices, roles, datos demo y evento). Para empezar de cero: `docker compose down -v` y de nuevo `docker compose up --build`, o `.\DB\herramientas\reiniciar_demo.ps1`.
+La primera vez MySQL ejecuta solo los scripts `DB/01` a `DB/13` (tablas, datos, triggers, procedimientos, reportes, vistas, índices, roles, datos demo y evento). Para empezar de cero: `docker compose down -v` y de nuevo `docker compose up --build`, o `.\DB\herramientas\reiniciar_demo.ps1`.
 
 ### Usuarios de prueba
 
-Todos usan la contraseña `Zimbra2026*`.
+Usuarios del equipo (`DB/13_usuarios_equipo.sql`):
+
+| Correo | Contraseña | Rol |
+| --- | --- | --- |
+| `admin@zimbra.com` | `Admin123` | Admin |
+| `marketing@zimbra.com` | `Mark123` | Marketing |
+| `ventas@zimbra.com` | `Vent123` | Vendedor |
+| `andres@zimbra.com`, `sergio@zimbra.com`, `juan@zimbra.com` | `admin123` | Admin |
+
+Empleados de ejemplo con datos cargados; todos usan la contraseña `Zimbra2026*`:
 
 | Rol | Correo | Ve |
 | --- | --- | --- |
@@ -59,7 +68,7 @@ npm run dev        # http://localhost:5173, se actualiza al guardar
 ```text
 Zimbra-Project/
 ├── DB/
-│   ├── 01_crear_tablas.sql ... 12_evento_vencimiento.sql   # Docker los ejecuta en orden
+│   ├── 01_crear_tablas.sql ... 13_usuarios_equipo.sql      # Docker los ejecuta en orden
 │   ├── herramientas/      # aplicar_datos_demo y reiniciar_demo (fuera de la raíz a propósito)
 │   ├── pruebas/           # 08 ACID, 09 carga 10 000, 10 EXPLAIN, 11 concurrencia, 12 permisos
 │   └── respaldo/          # respaldo y restauración (RNF-13)

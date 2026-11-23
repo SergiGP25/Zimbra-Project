@@ -19,6 +19,10 @@ Sin Docker: ver el README (MySQL en Docker, backend con `uvicorn`, frontend con 
 
 ## 2. Usuarios de prueba
 
+Usuarios del equipo: `admin@zimbra.com` / `Admin123` (Admin), `marketing@zimbra.com` / `Mark123` (Marketing), `ventas@zimbra.com` / `Vent123` (Vendedor), y `andres@zimbra.com`, `sergio@zimbra.com`, `juan@zimbra.com` / `admin123` (Admin). El vendedor `ventas@zimbra.com` empieza sin prospectos: asígnale algunos desde Prospectos para verlo trabajar.
+
+Empleados de ejemplo, con prospectos y ventas cargados:
+
 Contraseña de todos: `Zimbra2026*`
 
 | Rol | Correo | Qué puede hacer |

@@ -4,7 +4,7 @@ Railway ejecuta contenedores Docker a partir del repositorio de GitHub. El proye
 
 | Servicio | Se construye con | Qué hace |
 | --- | --- | --- |
-| `mysql` | `despliegue/Dockerfile.mysql` | MySQL 8 con los scripts `DB/01` a `DB/12` (sin `04`, que crea un usuario admin/admin) |
+| `mysql` | `despliegue/Dockerfile.mysql` | MySQL 8 con los scripts `DB/01` a `DB/13` (sin `04`, que crea un usuario admin/admin) |
 | `backend` | `backend/Dockerfile` | API FastAPI |
 | `frontend` | `despliegue/Dockerfile.frontend` | React compilado y servido con nginx |
 
@@ -94,6 +94,7 @@ Si el remitente es un Gmail, los correos pueden llegar a *Spam*, porque Gmail no
 - Abre la dirección del frontend y activa una prueba gratis con tu correo real. Deben llegarte dos correos: bienvenida y prueba activada.
 - En `/login`, pulsa **¿Olvidaste tu contraseña?** con un usuario de prueba. Los correos `@zimbra-demo.com` no existen, así que el enlace no llegará a ningún buzón. Para probarlo, cambia el correo de un empleado por el tuyo desde **Empleados** (como Admin).
 - Inicia sesión como Admin, Marketing y Vendedor y recorre el flujo completo.
+- **Antes de compartir el enlace, cambia las claves de los usuarios de `DB/13_usuarios_equipo.sql`** (Admin123, admin123…): en internet cualquiera podría probarlas. Se cambian desde "Cambiar contraseña" con cada usuario.
 
 ## Problemas frecuentes
 

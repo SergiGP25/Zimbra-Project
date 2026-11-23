@@ -19,6 +19,7 @@ COPY DB/01_crear_tablas.sql \
      DB/10_roles_permisos.sql \
      DB/11_datos_demo.sql \
      DB/12_evento_vencimiento.sql \
+     DB/13_usuarios_equipo.sql \
      /docker-entrypoint-initdb.d/
 
 # Las mismas opciones que docker-compose.yml: tildes correctas, hora de Colombia
