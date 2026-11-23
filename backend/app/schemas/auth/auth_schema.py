@@ -31,6 +31,16 @@ class TokenPayload(BaseModel):
     exp: Optional[int] = None
 
 
+def _validar_fortaleza(valor: str) -> str:
+    if not re.search(r"[A-Z]", valor):
+        raise ValueError("La nueva contraseña debe tener al menos una letra mayúscula")
+    if not re.search(r"[a-z]", valor):
+        raise ValueError("La nueva contraseña debe tener al menos una letra minúscula")
+    if not re.search(r"\d", valor):
+        raise ValueError("La nueva contraseña debe tener al menos un número")
+    return valor
+
+
 class CambioPasswordRequest(BaseModel):
     """
     Datos para cambiar la contraseña del usuario que inició sesión.
@@ -47,13 +57,7 @@ class CambioPasswordRequest(BaseModel):
     @field_validator("password_nueva")
     @classmethod
     def validar_fortaleza(cls, valor: str) -> str:
-        if not re.search(r"[A-Z]", valor):
-            raise ValueError("La nueva contraseña debe tener al menos una letra mayúscula")
-        if not re.search(r"[a-z]", valor):
-            raise ValueError("La nueva contraseña debe tener al menos una letra minúscula")
-        if not re.search(r"\d", valor):
-            raise ValueError("La nueva contraseña debe tener al menos un número")
-        return valor
+        return _validar_fortaleza(valor)
 
     @model_validator(mode="after")
     def validar_confirmacion(self) -> "CambioPasswordRequest":
@@ -65,3 +69,28 @@ class CambioPasswordRequest(BaseModel):
 
 class MensajeResponse(BaseModel):
     message: str
+
+
+class RecuperarPasswordRequest(BaseModel):
+    """Paso 1 de "¿Olvidaste tu contraseña?": el correo de la cuenta."""
+
+    email: str = Field(..., min_length=3, max_length=120)
+
+
+class RestablecerPasswordRequest(BaseModel):
+    """Paso 2: el token que llegó por correo y la contraseña nueva."""
+
+    token: str = Field(..., min_length=10)
+    password_nueva: str = Field(..., min_length=8, max_length=72)
+    confirmacion: str
+
+    @field_validator("password_nueva")
+    @classmethod
+    def validar_fortaleza(cls, valor: str) -> str:
+        return _validar_fortaleza(valor)
+
+    @model_validator(mode="after")
+    def validar_confirmacion(self) -> "RestablecerPasswordRequest":
+        if self.password_nueva != self.confirmacion:
+            raise ValueError("La confirmación no coincide con la nueva contraseña")
+        return self

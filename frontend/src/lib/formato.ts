@@ -1,5 +1,6 @@
-// Formatos para mostrar datos. Los precios del caso están en dólares (USD).
-const moneda = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 })
+// Formatos para mostrar datos. Todos los valores del sistema están en pesos
+// colombianos (COP); el peso no usa centavos en la práctica, por eso 0 decimales.
+const moneda = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
 
 export const formatoMoneda = (v: number | string | null | undefined) => (v == null ? '—' : moneda.format(Number(v)))
 

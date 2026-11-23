@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { descargarCSV, formatoFecha, formatoMoneda } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { ventaService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Indicador, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Indicador, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 import { FormVenta } from '../../components/crm/Formularios'
 
 /* RF-36 a RF-39: ventas, filtro por fechas y estado de pago. */
@@ -15,6 +15,7 @@ export const VentasPage: React.FC<{ params: Record<string, string> }> = () => {
   const [nueva, setNueva] = useState(false)
   const [aviso, setAviso] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => ventaService.listar(filtros), [JSON.stringify(filtros)])
+  const pag = usePaginacion(datos?.ventas)
 
   const pagar = async (id: number) => {
     try {
@@ -56,7 +57,7 @@ export const VentasPage: React.FC<{ params: Record<string, string> }> = () => {
           <table className="data-table">
             <thead><tr><th className="num">N.º</th><th>Fecha</th><th>Cliente</th><th>Producto</th><th className="num">Monto</th><th>Pago</th><th>Estado</th><th>Vendedor</th><th><span className="sr-only">Acciones</span></th></tr></thead>
             <tbody>
-              {datos?.ventas.map((v) => (
+              {pag.visibles.map((v) => (
                 <tr key={v.venta_id}>
                   <td className="num">{v.venta_id}</td>
                   <td className="cell-sub">{formatoFecha(v.fecha_venta)}</td>
@@ -77,6 +78,7 @@ export const VentasPage: React.FC<{ params: Record<string, string> }> = () => {
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="ventas" />
       {nueva && <FormVenta onClose={() => setNueva(false)} onGuardado={(m) => { setNueva(false); setAviso({ tipo: 'success', texto: m }); recargar() }} />}
     </div>
   )

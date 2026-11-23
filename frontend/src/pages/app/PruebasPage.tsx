@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { formatoFecha } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { pruebaService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 import { FormPrueba } from '../../components/crm/Formularios'
 
 /* RF-17 a RF-21: pruebas gratuitas de 60 días. */
@@ -16,6 +16,7 @@ export const PruebasPage: React.FC<{ params: Record<string, string> }> = () => {
   const [nueva, setNueva] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => pruebaService.listar({ estado, por_vencer: porVencer }), [estado, porVencer])
+  const pag = usePaginacion(datos)
 
   const vencer = async () => {
     const r = await pruebaService.vencer()
@@ -44,7 +45,7 @@ export const PruebasPage: React.FC<{ params: Record<string, string> }> = () => {
           <table className="data-table">
             <thead><tr><th>Prospecto</th><th>Producto</th><th>Inicio</th><th>Fin</th><th className="num">Días restantes</th><th>Estado</th><th>Vendedor</th></tr></thead>
             <tbody>
-              {datos?.map((p) => (
+              {pag.visibles.map((p) => (
                 <tr key={p.descarga_id}>
                   <td><Enlace to={`/app/prospectos/${p.prospecto_id}`} className="cell-title">{p.prospecto}</Enlace><div className="cell-sub">{p.empresa}</div></td>
                   <td>{p.producto}</td>
@@ -61,6 +62,7 @@ export const PruebasPage: React.FC<{ params: Record<string, string> }> = () => {
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="pruebas" />
       {nueva && <FormPrueba onClose={() => setNueva(false)} onGuardado={(m) => { setNueva(false); setAviso(m); recargar() }} />}
     </div>
   )

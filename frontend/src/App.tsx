@@ -12,6 +12,8 @@ import { AppLayout } from './components/layout/AppLayout'
   Decide qué mostrar según la ruta y la sesión:
     /            -> sitio público
     /login       -> página de inicio de sesión
+    /recuperar   -> pedir enlace para restablecer la contraseña
+    /restablecer -> crear contraseña nueva (enlace del correo)
     /app/...     -> sistema interno (exige sesión)
   Si alguien entra a /app sin sesión, va a /login; si ya inició sesión y
   abre /login, va a /app.
@@ -34,6 +36,8 @@ const Rutas: React.FC = () => {
   }
   if (zonaInterna) return isAuthenticated ? <AppLayout ruta={ruta} /> : null
   if (ruta === '/login') return isAuthenticated ? null : <LoginPage />
+  if (ruta === '/recuperar') return <LoginPage vista="recuperar" />
+  if (ruta === '/restablecer') return <LoginPage vista="restablecer" />
   return <LandingPage />
 }
 

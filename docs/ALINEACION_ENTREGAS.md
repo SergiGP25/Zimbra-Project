@@ -12,6 +12,10 @@ Diferencias que conviene corregir en el PDF o tener presentes al sustentar.
 | Referencia a SQL de pruebas | Partes A–E | Partes A–E + `09_carga_10000_prospectos.sql` (RNF-03) | Mencionar |
 | Respaldo (RNF-13) | — | `DB/respaldo/` | Mencionar en sección 9 |
 | Pruebas automáticas (HU-43/44) | Solo SQL manual | `backend/tests` (pytest) y `scripts/probar_api.py` | Mencionar en sección 9 |
+| Moneda | Valores en dólares | Pesos colombianos (COP) en datos y pantallas | Actualizar tablas y capturas con montos |
+| Correos | Fuera de alcance | Bienvenida, prueba activada, recuperación y aviso de cambio de contraseña (Mailpit en local, Brevo en la nube) | Mencionar como mejora sobre el alcance |
+| Vencimiento de pruebas (RF-19) | Proceso manual | Evento diario `ev_vencer_pruebas` (`DB/12`) además del botón | Mencionar en transacciones |
+| Paginación (RNF-04) | Prospectos | Todos los listados, 20 por página | — |
 
 Pendiente que solo puede hacer el equipo: prueba manual en Chrome, Firefox y Edge (RNF-02) y registrar el resultado de `09_carga_10000_prospectos.sql` (RNF-03).
 

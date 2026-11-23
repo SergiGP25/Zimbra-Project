@@ -1,6 +1,7 @@
 import React from 'react'
 import '../styles/landing.css'
 import { LoginForm } from '../components/auth/LoginForm'
+import { RecuperarForm, RestablecerForm } from '../components/auth/RecuperarPassword'
 import { ThemeToggle } from '../components/theme/ThemeToggle'
 import { Enlace } from '../router/router'
 
@@ -8,8 +9,10 @@ import { Enlace } from '../router/router'
   Página de inicio de sesión (/login), separada del sitio público.
   Dos columnas: a la izquierda qué es el sistema; a la derecha el formulario.
   En celular solo se ve el formulario.
+  La misma página sirve para "¿Olvidaste tu contraseña?" (/recuperar) y
+  para crear la contraseña nueva desde el enlace del correo (/restablecer).
 */
-export const LoginPage: React.FC = () => (
+export const LoginPage: React.FC<{ vista?: 'login' | 'recuperar' | 'restablecer' }> = ({ vista = 'login' }) => (
   <div className="login-page">
     <aside className="login-aside">
       <Enlace to="/" className="wordmark wordmark-light" aria-label="Volver al inicio">
@@ -37,8 +40,14 @@ export const LoginPage: React.FC = () => (
         <ThemeToggle />
       </div>
       <div className="login-card">
-        <LoginForm />
-        <p className="login-note">¿Olvidaste tu contraseña? Pídele al administrador que la restablezca.</p>
+        {vista === 'login' && (
+          <>
+            <LoginForm />
+            <p className="login-note"><Enlace to="/recuperar">¿Olvidaste tu contraseña?</Enlace></p>
+          </>
+        )}
+        {vista === 'recuperar' && <RecuperarForm />}
+        {vista === 'restablecer' && <RestablecerForm />}
       </div>
     </main>
   </div>

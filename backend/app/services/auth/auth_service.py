@@ -3,11 +3,20 @@ from typing import Any, Dict, Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import verify_password, create_access_token, hash_password
+from app.core.config import settings
+from app.core.security import (
+    create_access_token,
+    crear_token_restablecer,
+    decode_access_token,
+    hash_password,
+    huella_password,
+    verify_password,
+)
 from app.repositories.empleados.empleado_repository import empleado_repository, EmpleadoRepository
 from app.schemas.auth.auth_schema import (
     CambioPasswordRequest,
     MensajeResponse,
+    RestablecerPasswordRequest,
     TokenResponse,
     UserAuthProfile,
 )
@@ -117,6 +126,52 @@ class AuthService:
         )
         logger.info("Contraseña actualizada para el empleado %s", usuario["id"])
         return MensajeResponse(message="Contraseña actualizada")
+
+    # ------------------------------------------------------------------
+    # ¿Olvidaste tu contraseña?
+    # ------------------------------------------------------------------
+    MENSAJE_RECUPERAR = (
+        "Si el correo pertenece a una cuenta activa, en unos minutos te llegará "
+        "un enlace para crear una contraseña nueva."
+    )
+
+    def preparar_recuperacion(self, email: str, db: Optional[Session] = None) -> Optional[Dict[str, Any]]:
+        """
+        Paso 1. Devuelve los datos para el correo, o None si no hay que enviar nada.
+        El router responde SIEMPRE el mismo mensaje (MENSAJE_RECUPERAR): si dijera
+        "ese correo no existe", cualquiera podría averiguar qué correos tienen cuenta.
+        """
+        empleado = self.emp_repo.get_by_email(email, db=db)
+        if not empleado or not empleado.get("activo", True):
+            logger.info("Recuperación pedida para un correo sin cuenta activa")
+            return None
+        token = crear_token_restablecer(empleado["id"], empleado["password_hash"], settings.RESET_TOKEN_MINUTOS)
+        enlace = f"{settings.FRONTEND_URL.rstrip('/')}/restablecer?token={token}"
+        return {"email": empleado["email"], "nombre": empleado["nombre"], "enlace": enlace,
+                "minutos": settings.RESET_TOKEN_MINUTOS}
+
+    def restablecer(self, datos: RestablecerPasswordRequest, db: Optional[Session] = None) -> Dict[str, Any]:
+        """
+        Paso 2. Valida el token del correo y guarda la contraseña nueva.
+        Se responde 400 (no 401) porque quien llega aquí no tiene sesión abierta.
+        """
+        invalido = HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El enlace no es válido o ya venció. Pide uno nuevo.",
+        )
+        datos_token = decode_access_token(datos.token)          # firma y vencimiento
+        if not datos_token or datos_token.get("tipo") != "restablecer":
+            raise invalido
+        empleado = self.emp_repo.get_by_id(int(datos_token["sub"]), db=db)
+        if not empleado or not empleado.get("activo", True):
+            raise invalido
+        # La huella cambia cuando cambia la contraseña: el enlace no se puede reutilizar
+        if datos_token.get("huella") != huella_password(empleado["password_hash"]):
+            raise invalido
+
+        self.emp_repo.update(empleado["id"], {"password_hash": hash_password(datos.password_nueva)}, db=db)
+        logger.info("Contraseña restablecida por correo para el empleado %s", empleado["id"])
+        return {"email": empleado["email"], "nombre": empleado["nombre"]}
 
 
 auth_service = AuthService()

@@ -34,6 +34,15 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Un token con "tipo" (por ejemplo, el de restablecer contraseña que llega
+    # por correo) no es una sesión: no abre ninguna ruta protegida.
+    if payload.get("tipo"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado. Inicie sesión nuevamente.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     sub = payload.get("sub")
     if not sub:
         raise HTTPException(

@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { formatoFechaHora } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { visitaService } from '../../services/crm/crmService'
-import { Cargando, Encabezado, ErrorCarga, SelectorProspecto, Vacio } from '../../components/ui/ui'
+import { Cargando, Encabezado, ErrorCarga, SelectorProspecto, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 
 // Páginas típicas del sitio de Zimbra para el simulador
 const PAGINAS = ['/precios', '/caracteristicas', '/descargas', '/documentacion', '/blog', '/casos-de-exito', '/soporte', '/contacto', '/inicio']
@@ -22,7 +22,8 @@ export const VisitasPage: React.FC<{ params: Record<string, string> }> = () => {
   const [resultado, setResultado] = useState<string | null>(null)
   const [errorEnvio, setErrorEnvio] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
-  const historial = useCarga(() => visitaService.listar({ limite: 50 }), [])
+  const historial = useCarga(() => visitaService.listar({ limite: 200 }), [])
+  const pag = usePaginacion(historial.datos)
 
   const registrar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,7 +71,7 @@ export const VisitasPage: React.FC<{ params: Record<string, string> }> = () => {
           <table className="data-table">
             <thead><tr><th>Fecha</th><th>Prospecto</th><th>Página</th><th className="num">Duración</th><th className="num">Puntos</th></tr></thead>
             <tbody>
-              {historial.datos?.map((v) => (
+              {pag.visibles.map((v) => (
                 <tr key={v.visita_id}>
                   <td className="cell-sub">{formatoFechaHora(v.fecha_hora)}</td>
                   <td><Enlace to={`/app/prospectos/${v.prospecto_id}`}>{v.prospecto}</Enlace></td>
@@ -83,6 +84,7 @@ export const VisitasPage: React.FC<{ params: Record<string, string> }> = () => {
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="visitas" />
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { formatoFecha, formatoMoneda } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { propuestaService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 import { FormPropuesta, FormVenta } from '../../components/crm/Formularios'
 
 /*
@@ -19,6 +19,7 @@ export const PropuestasPage: React.FC<{ params: Record<string, string> }> = () =
   const [ventana, setVentana] = useState<{ tipo: 'nueva' } | { tipo: 'venta'; id: number } | null>(null)
   const [aviso, setAviso] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => propuestaService.listar({ estado }), [estado])
+  const pag = usePaginacion(datos)
   const gestiona = puede.gestionarPropuestas(user?.rol)
 
   const responder = async (id: number, nuevo: 'Aceptada' | 'Rechazada') => {
@@ -51,7 +52,7 @@ export const PropuestasPage: React.FC<{ params: Record<string, string> }> = () =
           <table className="data-table">
             <thead><tr><th className="num">N.º</th><th>Prospecto</th><th>Producto</th><th className="num">Licencias</th><th className="num">Valor</th><th>Emitida</th><th>Estado</th><th>Vendedor</th><th><span className="sr-only">Acciones</span></th></tr></thead>
             <tbody>
-              {datos?.map((p) => (
+              {pag.visibles.map((p) => (
                 <tr key={p.propuesta_id}>
                   <td className="num">{p.propuesta_id}</td>
                   <td><Enlace to={`/app/prospectos/${p.prospecto_id}`} className="cell-title">{p.prospecto}</Enlace><div className="cell-sub">{p.empresa}</div></td>
@@ -79,6 +80,7 @@ export const PropuestasPage: React.FC<{ params: Record<string, string> }> = () =
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="propuestas" />
       {ventana?.tipo === 'nueva' && <FormPropuesta onClose={() => setVentana(null)} onGuardado={guardado} />}
       {ventana?.tipo === 'venta' && <FormVenta propuestaId={ventana.id} onClose={() => setVentana(null)} onGuardado={guardado} />}
     </div>

@@ -5,7 +5,7 @@ import { formatoFecha, formatoMoneda, hoyISO } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { campanaService } from '../../services/crm/crmService'
 import { Campana } from '../../types/crm/crmTypes'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Modal, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Modal, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 
 /* RF-12 y RF-13: campañas de marketing y lo que produjo cada una (RF-42). */
 export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => {
@@ -14,6 +14,7 @@ export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => 
   const [editando, setEditando] = useState<Campana | 'nueva' | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => campanaService.listar({ canal }), [canal])
+  const pag = usePaginacion(datos?.campanas)
 
   return (
     <div>
@@ -34,7 +35,7 @@ export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => 
           <table className="data-table">
             <thead><tr><th>Campaña</th><th>Canal</th><th>Vigencia</th><th className="num">Presupuesto</th><th className="num">Prospectos</th><th className="num">Pruebas</th><th className="num">Ventas</th><th className="num">Vendido</th><th><span className="sr-only">Acciones</span></th></tr></thead>
             <tbody>
-              {datos?.campanas.map((c) => (
+              {pag.visibles.map((c) => (
                 <tr key={c.campana_id}>
                   <td className="cell-title">{c.nombre}{c.vigente && <span className="tag">Vigente</span>}</td>
                   <td>{c.canal}</td>
@@ -53,6 +54,7 @@ export const CampanasPage: React.FC<{ params: Record<string, string> }> = () => 
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="campañas" />
       {editando && <FormCampana campana={editando === 'nueva' ? undefined : editando} onClose={() => setEditando(null)}
         onGuardado={(m) => { setEditando(null); setAviso(m); recargar() }} />}
     </div>
@@ -90,8 +92,8 @@ const FormCampana: React.FC<{ campana?: Campana; onClose: () => void; onGuardado
         <div className="form-grid-2">
           <div className="form-group"><label htmlFor="c-canal">Canal</label>
             <select id="c-canal" name="canal" className="input" value={form.canal} onChange={cambiar}><option>Email</option><option>Web</option><option>Referido</option></select></div>
-          <div className="form-group"><label htmlFor="c-presupuesto">Presupuesto (USD)</label>
-            <input id="c-presupuesto" name="presupuesto" type="number" min={0} step="0.01" className="input" value={form.presupuesto} onChange={cambiar} /></div>
+          <div className="form-group"><label htmlFor="c-presupuesto">Presupuesto (COP)</label>
+            <input id="c-presupuesto" name="presupuesto" type="number" min={0} step="1" className="input" value={form.presupuesto} onChange={cambiar} /></div>
           <div className="form-group"><label htmlFor="c-inicio">Inicio</label>
             <input id="c-inicio" name="fecha_inicio" type="date" className="input" value={form.fecha_inicio} onChange={cambiar} required /></div>
           <div className="form-group"><label htmlFor="c-fin">Fin <span className="optional">(opcional)</span></label>

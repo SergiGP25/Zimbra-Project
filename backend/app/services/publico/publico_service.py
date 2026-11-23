@@ -84,6 +84,7 @@ class PublicoService:
                 detail="Este correo ya es de un cliente. Tu asesor puede activarte más productos.",
             )
 
+        nuevo = existente is None
         try:
             if existente:
                 prospecto_id = existente["prospecto_id"]
@@ -127,6 +128,7 @@ class PublicoService:
             fecha_inicio=descarga["fecha_inicio"],
             fecha_fin=descarga["fecha_fin"],
             mensaje=f"Tu prueba de {producto['nombre']} está activa hasta el {descarga['fecha_fin']:%d/%m/%Y}.",
+            prospecto_nuevo=nuevo,
         )
 
 

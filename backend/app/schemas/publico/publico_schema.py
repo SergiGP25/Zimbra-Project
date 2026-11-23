@@ -59,3 +59,4 @@ class PruebaRegistrada(BaseModel):
     fecha_inicio: date
     fecha_fin: date
     mensaje: str
+    prospecto_nuevo: bool = False  # True si el correo no estaba registrado

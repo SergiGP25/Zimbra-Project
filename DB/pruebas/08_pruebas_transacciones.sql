@@ -20,18 +20,18 @@ USE crm_zimbra;
 -- =====================================================================
 
 -- A1. ROLLBACK: el cambio se ve dentro de la transacción y luego desaparece
-SELECT presupuesto FROM campana WHERE campana_id = 1;      -- 11500.00
+SELECT presupuesto FROM campana WHERE campana_id = 1;      -- 46000000.00
 START TRANSACTION;                                          -- = BEGIN TRANSACTION
     UPDATE campana SET presupuesto = 99999 WHERE campana_id = 1;
     SELECT presupuesto FROM campana WHERE campana_id = 1;  -- 99999.00
 ROLLBACK;
-SELECT presupuesto FROM campana WHERE campana_id = 1;      -- ESPERADO: 11500.00
+SELECT presupuesto FROM campana WHERE campana_id = 1;      -- ESPERADO: 46000000.00
 
 -- A2. COMMIT: el cambio queda permanente (durabilidad)
 START TRANSACTION;
     UPDATE campana SET presupuesto = presupuesto + 500 WHERE campana_id = 1;
 COMMIT;
-SELECT presupuesto FROM campana WHERE campana_id = 1;      -- ESPERADO: 12000.00
+SELECT presupuesto FROM campana WHERE campana_id = 1;      -- ESPERADO: 46000500.00
 
 -- A3. Error a mitad de una transacción SIN manejador:
 --     MySQL solo deshace la instrucción que falló; la anterior sigue
@@ -40,9 +40,9 @@ START TRANSACTION;
     UPDATE campana SET presupuesto = presupuesto + 1 WHERE campana_id = 2;  -- funciona
     INSERT INTO venta (propuesta_id, monto_final, forma_pago)
     VALUES (1, 100, 'Tarjeta');                             -- falla: TR-06/UNIQUE
-    SELECT presupuesto FROM campana WHERE campana_id = 2;   -- 17751.00 (sigue el cambio)
+    SELECT presupuesto FROM campana WHERE campana_id = 2;   -- 71000001.00 (sigue el cambio)
 ROLLBACK;                                                   -- decisión: deshacer todo
-SELECT presupuesto FROM campana WHERE campana_id = 2;      -- ESPERADO: 17750.00
+SELECT presupuesto FROM campana WHERE campana_id = 2;      -- ESPERADO: 71000000.00
 
 -- A4. SAVEPOINT: deshacer solo una parte y confirmar el resto
 SELECT COUNT(*) FROM visita_web WHERE prospecto_id = 45;   -- anote el valor (n)
@@ -113,7 +113,7 @@ VALUES (20, 23, 10, 20, 1, 'Aceptada');
 SET @prop = LAST_INSERT_ID();
 SELECT propuesta_id, num_licencias, valor_total, estado
   FROM propuesta WHERE propuesta_id = @prop;
--- ESPERADO: valor_total = 900.00 (20 x 45) y estado = Enviada
+-- ESPERADO: valor_total = 3600000.00 (20 x 180000) y estado = Enviada
 
 -- B7. Trigger TR-03 - Actualizar estado de la propuesta (Enviada -> Aceptada)
 CALL sp_actualizar_propuesta(@prop, 'Aceptada', 23);
@@ -123,7 +123,7 @@ SELECT * FROM historial_estado
 
 -- B8. T4 - Registrar la venta (transacción crítica)
 CALL sp_registrar_venta(@prop, 'Transferencia', NULL, @venta);
-SELECT venta_id, monto_final, estado FROM venta WHERE venta_id = @venta;  -- 900.00, Pendiente
+SELECT venta_id, monto_final, estado FROM venta WHERE venta_id = @venta;  -- 3600000.00, Pendiente
 SELECT estado FROM prospecto WHERE prospecto_id = 20;       -- ESPERADO: Cliente
 SELECT estado FROM descarga_prueba WHERE prospecto_id = 20; -- ESPERADO: Convertida
 

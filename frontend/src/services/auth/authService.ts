@@ -21,6 +21,22 @@ export const authService = {
     })
   },
 
+  // ¿Olvidaste tu contraseña? Paso 1: el backend envía el enlace por correo
+  async recuperarPassword(email: string): Promise<{ message: string }> {
+    return request<{ message: string }>('/auth/recuperar', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+  },
+
+  // Paso 2: el token viene en el enlace del correo (?token=...)
+  async restablecerPassword(token: string, password_nueva: string, confirmacion: string): Promise<{ message: string }> {
+    return request<{ message: string }>('/auth/restablecer', {
+      method: 'POST',
+      body: JSON.stringify({ token, password_nueva, confirmacion }),
+    })
+  },
+
   async logout(): Promise<{ status: string; message: string }> {
     return request<{ status: string; message: string }>('/auth/logout', {
       method: 'POST',

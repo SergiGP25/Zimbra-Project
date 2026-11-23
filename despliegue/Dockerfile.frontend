@@ -1,0 +1,23 @@
+# Frontend para producción: se compila una sola vez y se sirve con nginx.
+# En desarrollo (docker-compose) se usa frontend/Dockerfile con "npm run dev",
+# que recarga al guardar pero es lento y pesado para un servidor real.
+
+# ---- Etapa 1: compilar ------------------------------------------------
+FROM node:20-alpine AS compilar
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+# Vite escribe la dirección de la API dentro del JavaScript al compilar,
+# por eso se pasa como argumento de construcción (Railway la envía sola si
+# existe una variable con este nombre en el servicio).
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+RUN npx vite build
+
+# ---- Etapa 2: servir ----------------------------------------------------
+FROM nginx:1.27-alpine
+# La imagen de nginx reemplaza ${PORT} en las plantillas al arrancar
+ENV PORT=80
+COPY despliegue/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=compilar /app/dist /usr/share/nginx/html

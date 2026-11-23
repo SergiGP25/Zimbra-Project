@@ -19,6 +19,8 @@ import time
 import requests
 
 API = "http://localhost:8000/api/v1"
+# Bandeja de Mailpit vista desde el contenedor del backend (servicio "mailpit")
+MAILPIT = "http://mailpit:8025/api/v1"
 CLAVE = "Zimbra2026*"
 resultados = []
 
@@ -40,6 +42,15 @@ def entrar(correo):
     r = requests.post(f"{API}/auth/login", json={"email": correo, "password": CLAVE})
     revisar(f"login {correo}", r, 200)
     return {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+
+def correos_para(destino):
+    """Asuntos de los correos que Mailpit recibió para un destinatario (None si Mailpit no responde)."""
+    try:
+        r = requests.get(f"{MAILPIT}/search", params={"query": f"to:{destino}"}, timeout=5)
+        return [m["Subject"] for m in r.json().get("messages", [])]
+    except Exception:
+        return None
 
 
 def main():
@@ -115,6 +126,29 @@ def main():
     revisar("Asignar a vendedor inactivo rechazado", requests.patch(f"{API}/prospectos/{pid}/asignar", headers=admin,
                                                                     json={"empleado_id": 29}), 400)
     revisar("Vencer pruebas (savepoint)", requests.post(f"{API}/pruebas/vencer", headers=admin), 200)
+
+    print("\n6. Correos (Mailpit, http://localhost:8025)")
+    visitante = f"visitante{int(time.time())}@demo.com"
+    revisar("Registro público con prueba gratis", requests.post(f"{API}/publico/prueba-gratis", json={
+        "nombre": "Visitante Demo", "email": visitante, "producto_id": gratis}), 201)
+    revisar("¿Olvidaste tu contraseña? responde igual exista o no la cuenta",
+            requests.post(f"{API}/auth/recuperar", json={"email": "no.existe@zimbra-demo.com"}), 200)
+    revisar("Pedir enlace para una cuenta real", requests.post(f"{API}/auth/recuperar",
+                                                              json={"email": "camila.rojas1@zimbra-demo.com"}), 200)
+    revisar("Enlace falso rechazado", requests.post(f"{API}/auth/restablecer", json={
+        "token": "token-que-no-es-valido", "password_nueva": "Nueva2026x", "confirmacion": "Nueva2026x"}), 400)
+    time.sleep(2)  # los correos salen en segundo plano, después de la respuesta
+    asuntos = correos_para(visitante)
+    if asuntos is None:
+        print("     (Mailpit no responde: se omite la revisión de la bandeja)")
+    else:
+        print(f"     correos para el visitante: {asuntos}")
+        ok = any("Recibimos tu registro" in a for a in asuntos) and any("está activa" in a for a in asuntos)
+        print(f"  {'OK   ' if ok else 'FALLA'} Llegaron la bienvenida y la prueba activada")
+        resultados.append(ok)
+        ok = any("Restablece" in a for a in (correos_para("camila.rojas1@zimbra-demo.com") or []))
+        print(f"  {'OK   ' if ok else 'FALLA'} Llegó el enlace para restablecer la contraseña")
+        resultados.append(ok)
 
     total, buenos = len(resultados), sum(resultados)
     print(f"\nResultado: {buenos} de {total} comprobaciones correctas.")

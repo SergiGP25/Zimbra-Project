@@ -85,7 +85,7 @@ Todos van bajo `http://localhost:8000/api/v1`. Puedes probarlos en **http://loca
 | Estado | `GET /health` | Comprueba la conexión con MySQL | Evidencia | Todos |
 | Público | `GET /publico/productos-gratuitos`, `GET /publico/planes` | Datos para la página de inicio | — | Sin sesión |
 | Público | `POST /publico/prueba-gratis` | Registro del visitante + T1 | RF-05, RF-17 | Sin sesión |
-| Auth | `POST /auth/login`, `GET /auth/me`, `PUT /auth/password` | Sesión y cambio de contraseña | RF-01 a RF-03 | Todos |
+| Auth | `POST /auth/login`, `GET /auth/me`, `PUT /auth/password`, `POST /auth/recuperar`, `POST /auth/restablecer` | Sesión, cambio y recuperación de contraseña por correo | RF-01 a RF-03 | Todos (recuperar: sin sesión) |
 | Empleados | `GET/POST/PUT /empleados/` | Gestión de usuarios | RF-04 | Admin |
 | Campañas | `GET/POST/PUT /campanas/` | Campañas con resultados | RF-12, RF-13 | Admin, Marketing |
 | Productos | `GET/POST/PUT /productos/`, `PATCH /{id}/activo` | Catálogo | RF-14 a RF-16 | Admin edita |
@@ -145,6 +145,7 @@ frontend/src/
 |---|---|---|
 | `/` | Sitio público: producto, planes, prueba gratis, preguntas | Todos |
 | `/login` | Inicio de sesión | Sin sesión |
+| `/recuperar`, `/restablecer?token=…` | ¿Olvidaste tu contraseña? y contraseña nueva desde el correo | Sin sesión |
 | `/app` | Panel con indicadores y embudo | Todos |
 | `/app/alertas` | Bandeja de alertas | Todos (vendedor: las suyas) |
 | `/app/prospectos` y `/app/prospectos/:id` | Listado y ficha | Todos |
@@ -169,6 +170,26 @@ docker compose up --build
 - Sitio: http://localhost:5174
 - API y Swagger: http://localhost:8000/docs
 - Conexión con la base: http://localhost:8000/api/v1/health
+- Correos enviados (Mailpit): http://localhost:8025
+
+### Correos
+
+El backend envía cuatro correos, siempre en segundo plano (`BackgroundTasks`): la respuesta sale primero y, si el correo falla, la operación ya quedó guardada en la base.
+
+| Evento | Correo | Dónde se programa |
+|---|---|---|
+| Registro desde el sitio público | Bienvenida | `api/v1/publico/publico_router.py` |
+| Prueba activada (sitio o CRM) | Producto, inicio y fin de la prueba | `publico_router.py` y `pruebas/prueba_router.py` |
+| ¿Olvidaste tu contraseña? | Enlace firmado que vence en 30 minutos | `auth/auth_router.py` |
+| Contraseña cambiada o restablecida | Aviso de seguridad | `auth/auth_router.py` |
+
+El enlace de recuperación es un JWT con `tipo = "restablecer"` y una *huella* del hash de la contraseña. Sirve una sola vez, porque al cambiar la contraseña la huella deja de coincidir, y no abre ninguna ruta protegida, porque `get_current_user` rechaza los tokens con `tipo`. Si el correo no existe, la API responde el mismo mensaje, para que nadie averigüe qué cuentas hay.
+
+Modos de envío (`CORREO_MODO`): `consola` (solo log), `smtp` (Mailpit en local) y `brevo` (API HTTPS, para la nube).
+
+### Moneda
+
+Todos los valores están en pesos colombianos (COP): precios por licencia, presupuestos, propuestas y ventas. El frontend los muestra con `Intl.NumberFormat('es-CO', { currency: 'COP' })` en `lib/formato.ts`. Los datos semilla se convirtieron con una tasa fija de 4.000 COP por dólar, así se conserva la relación valor = licencias × precio.
 
 ### Usuarios de prueba (contraseña `Zimbra2026*`)
 
@@ -207,7 +228,7 @@ Recorre el proceso completo (prospecto, T1, T2, T3, propuesta, T4, pago) y prueb
 ## 7. Límites conocidos
 
 - Las visitas web se simulan con un formulario; no hay rastreo real del sitio.
-- No se envían correos reales (alertas y confirmaciones solo quedan registradas).
+- En local los correos quedan en Mailpit; para correos reales hay que configurar Brevo (ver `docs/DESPLIEGUE_RAILWAY.md`). Las alertas a vendedores se ven en el CRM, no por correo.
 - El formulario público de prueba gratis no tiene captcha.
 - El token dura 30 minutos y no se renueva solo.
 - Los datos de ejemplo se cargaron directamente, así que algunos puntajes guardados no coinciden con el calculado desde el historial (la ficha lo muestra).

@@ -29,6 +29,27 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
+    # Dirección pública del frontend: se usa en los enlaces de los correos
+    # (por ejemplo, el enlace para restablecer la contraseña).
+    FRONTEND_URL: str = "http://localhost:5174"
+
+    # Correos (ver app/core/correo.py)
+    #   consola -> no envía nada, escribe el correo en el log (por defecto)
+    #   smtp    -> servidor SMTP (en local: Mailpit, http://localhost:8025)
+    #   brevo   -> API HTTPS de Brevo (para Railway, que bloquea SMTP)
+    CORREO_MODO: str = "consola"
+    CORREO_REMITENTE: str = "no-reply@zimbra-demo.com"
+    CORREO_REMITENTE_NOMBRE: str = "Zimbra CRM"
+    SMTP_HOST: str = "localhost"
+    SMTP_PORT: int = 1025
+    SMTP_USUARIO: str = ""
+    SMTP_CLAVE: str = ""
+    SMTP_TLS: bool = False
+    BREVO_API_KEY: str = ""
+
+    # Minutos de validez del enlace para restablecer la contraseña
+    RESET_TOKEN_MINUTOS: int = 30
+
     @property
     def get_database_url(self) -> str:
         if self.DATABASE_URL:

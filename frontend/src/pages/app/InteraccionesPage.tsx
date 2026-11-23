@@ -5,7 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { formatoFechaHora } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { interaccionService } from '../../services/crm/crmService'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 import { FormInteraccion } from '../../components/crm/Formularios'
 
 /* RF-29 a RF-31: llamadas y correos del equipo de ventas. */
@@ -16,6 +16,7 @@ export const InteraccionesPage: React.FC<{ params: Record<string, string> }> = (
   const [nueva, setNueva] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => interaccionService.listar({ tipo, resultado }), [tipo, resultado])
+  const pag = usePaginacion(datos)
 
   return (
     <div>
@@ -37,7 +38,7 @@ export const InteraccionesPage: React.FC<{ params: Record<string, string> }> = (
           <table className="data-table">
             <thead><tr><th>Fecha</th><th>Prospecto</th><th>Tipo</th><th>Resultado</th><th>Notas</th><th>Registró</th></tr></thead>
             <tbody>
-              {datos?.map((i) => (
+              {pag.visibles.map((i) => (
                 <tr key={i.interaccion_id}>
                   <td className="cell-sub">{formatoFechaHora(i.fecha_hora)}</td>
                   <td><Enlace to={`/app/prospectos/${i.prospecto_id}`} className="cell-title">{i.prospecto}</Enlace><div className="cell-sub">{i.empresa}</div></td>
@@ -51,6 +52,7 @@ export const InteraccionesPage: React.FC<{ params: Record<string, string> }> = (
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="interacciones" />
       {nueva && <FormInteraccion onClose={() => setNueva(false)} onGuardado={(m) => { setNueva(false); setAviso(m); recargar() }} />}
     </div>
   )

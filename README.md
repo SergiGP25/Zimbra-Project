@@ -1,186 +1,122 @@
-# Proyecto CRM Zimbra - Sistemas Transaccionales
+# CRM Zimbra · Sistemas Transaccionales
 
-Sistema transaccional de prospectos, marketing y ventas construido con arquitectura limpia por capas y desacoplada:
-- **Base de Datos**: MySQL 8.0 orquestado mediante **Docker Compose** en el puerto `3307` con carga de esquema e integridad referencial (`DB/`).
-- **Backend**: API REST desarrollada en **Python** con **FastAPI**, **SQLAlchemy** y autenticación **JWT** con expiración a 30 minutos (cumpliendo principios SOLID).
-- **Frontend**: SPA desarrollada en **React 18**, **Vite** y **TypeScript** con control de acceso por rol (RBAC) y detector de inactividad.
+Sistema transaccional de prospectos, marketing y ventas basado en el caso Zimbra: un visitante se registra y activa una prueba gratuita de 60 días; sus visitas suben un puntaje; al llegar a 50 puntos queda *Calificado* y su vendedor recibe una alerta; el vendedor registra llamadas, envía una propuesta y, si la aceptan, registra la venta. Todo el proceso corre sobre transacciones ACID en MySQL.
+
+| Capa | Tecnología |
+| --- | --- |
+| Base de datos | MySQL 8.0: 11 tablas, 8 triggers, 5 transacciones críticas (T1 a T5), 6 reportes, 8 vistas, índices, roles y un evento diario |
+| Backend | Python 3.12, FastAPI, SQLAlchemy, JWT (sesión de 30 minutos), bcrypt |
+| Frontend | React 18, Vite, TypeScript, tema claro y oscuro |
+| Correos | Mailpit en local; Brevo (API HTTPS) en la nube |
+| Moneda | Pesos colombianos (COP) en precios, presupuestos, propuestas y ventas |
 
 ---
 
-## 📂 Estructura del Repositorio (Clean Architecture por Módulos)
+## Arranque rápido (Docker)
+
+Requisito: Docker Desktop abierto.
+
+```bash
+cp .env.example .env          # solo la primera vez
+docker compose up --build
+```
+
+| Qué | Dónde |
+| --- | --- |
+| Sitio público y CRM | http://localhost:5174 (inicio de sesión en `/login`) |
+| API y documentación Swagger | http://localhost:8000/docs |
+| Estado de la API y la base | http://localhost:8000/api/v1/health |
+| Bandeja de correos de prueba (Mailpit) | http://localhost:8025 |
+| MySQL desde tu PC | `localhost:3307`, usuario `root`, sin contraseña |
+
+La primera vez MySQL ejecuta solo los scripts `DB/01` a `DB/12` (tablas, datos, triggers, procedimientos, reportes, vistas, índices, roles, datos demo y evento). Para empezar de cero: `docker compose down -v` y de nuevo `docker compose up --build`, o `.\DB\herramientas\reiniciar_demo.ps1`.
+
+### Usuarios de prueba
+
+Todos usan la contraseña `Zimbra2026*`.
+
+| Rol | Correo | Ve |
+| --- | --- | --- |
+| Admin | `camila.rojas1@zimbra-demo.com` | Todo, más empleados y productos |
+| Marketing | `valentina.bermudez3@zimbra-demo.com` | Prospectos, campañas, visitas y reportes |
+| Vendedor | `carlos.salazar6@zimbra-demo.com` | Solo sus prospectos (RN-12) |
+
+### Diseñar sin reconstruir
+
+`docker compose up --build` copia el código dentro de la imagen, así que cada cambio de diseño obliga a reconstruir. Para ver los cambios al guardar:
+
+```bash
+docker compose up -d db backend mailpit
+cd frontend
+npm install
+npm run dev        # http://localhost:5173, se actualiza al guardar
+```
+
+---
+
+## Estructura
 
 ```text
 Zimbra-Project/
-├── DB/                               # Scripts SQL de base de datos
-│   ├── 01_crear_tablas.sql           # 11 tablas, restricciones, columnas generadas e índices
-│   ├── 02_insertar_datos.sql         # Datos simulados (30+ registros por tabla)
-│   ├── 03_verificacion.sql           # Consultas de auditoría e integridad
-│   ├── 04_create_admin_user.sql      # Usuario MySQL del taller (eliminar en producción)
-│   ├── 05_triggers.sql               # 8 triggers (TR-01 a TR-08)
-│   ├── 06_transacciones.sql          # T1 a T5, SAVEPOINT, vencimiento de pruebas
-│   ├── 07_reportes.sql               # Reportes R-01 a R-06
-│   ├── 08_vistas.sql                 # 8 vistas para reportes simplificados
-│   ├── 09_indices.sql                # 10 índices adicionales
-│   ├── 10_roles_permisos.sql         # Roles y usuarios de MySQL (mínimo privilegio)
-│   ├── 11_datos_demo.sql             # Datos demo relativos a la fecha de hoy (idempotente)
-│   ├── herramientas/                 # aplicar_datos_demo.ps1/.sh y reiniciar_demo.ps1 (fuera de la raiz: Docker ejecuta todo lo que hay en DB/)
-│   ├── pruebas/                      # 08 a 12 (ACID, carga, EXPLAIN, concurrencia, permisos); no se ejecutan solos
-│   └── respaldo/                     # respaldo y restauración (RNF-13)
-├── docker-compose.yml                # Contenedor MySQL 8.0 en puerto 3307
-│
-├── backend/                          # Backend (FastAPI + Python)
-│   ├── app/
-│   │   ├── api/v1/                   # Controladores y endpoints HTTP por módulo
-│   │   │   ├── auth/auth_router.py   # HU-01: Login, me, logout
-│   │   │   ├── empleados/            # HU-03: CRUD Empleados exclusivo para Admin
-│   │   │   ├── prospectos/           # HU-04: Listado con filtro por rol (RN-12)
-│   │   │   ├── health/               # Endpoint de salud del servicio
-│   │   │   ├── dependencies.py       # RBAC (require_roles -> 403 Forbidden)
-│   │   │   └── router.py             # Enrutador consolidado v1
-│   │   ├── core/                     # Configuración (JWT, MySQL, CORS) y seguridad
-│   │   ├── schemas/                  # DTOs y validaciones Pydantic por módulo
-│   │   ├── services/                 # Lógica de negocio y reglas por módulo
-│   │   └── repositories/             # Persistencia directa con SQLAlchemy por módulo
-│   ├── requirements.txt              # Dependencias de Python
-│   ├── .env.example / .env           # Variables de entorno
-│   └── main.py                       # Lanzador local
-│
-├── frontend/                         # Frontend (React 18 + Vite + TypeScript)
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── auth/                 # LoginForm, ProtectedRoute (403 Forbidden)
-│   │   │   ├── layout/               # Navbar (botón logout), Sidebar (menú dinámico por rol)
-│   │   │   ├── empleados/            # EmpleadoList, EmpleadoModal
-│   │   │   └── prospectos/           # ProspectoList con banner explicativo RN-12
-│   │   ├── context/auth/             # Contexto global de autenticación y token
-│   │   ├── hooks/auth/               # useAuth, useInactivityTimer (30 minutos)
-│   │   ├── pages/                    # LoginPage, DashboardPage, EmpleadosPage, ProspectosPage
-│   │   ├── services/                 # Clientes API tipados hacia FastAPI
-│   │   └── types/                    # Interfaces de TypeScript por módulo
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vite.config.ts
-│
-└── README.md
+├── DB/
+│   ├── 01_crear_tablas.sql ... 12_evento_vencimiento.sql   # Docker los ejecuta en orden
+│   ├── herramientas/      # aplicar_datos_demo y reiniciar_demo (fuera de la raíz a propósito)
+│   ├── pruebas/           # 08 ACID, 09 carga 10 000, 10 EXPLAIN, 11 concurrencia, 12 permisos
+│   └── respaldo/          # respaldo y restauración (RNF-13)
+├── backend/app/
+│   ├── api/v1/            # un router por módulo: auth, empleados, prospectos, campanas, productos,
+│   │                      # pruebas, visitas, alertas, interacciones, propuestas, ventas, reportes, publico
+│   ├── schemas/           # validación de entrada y salida (Pydantic)
+│   ├── services/          # reglas de negocio; notificaciones/ arma y envía los correos
+│   ├── repositories/      # consultas SQL parametrizadas
+│   └── core/              # configuración, seguridad (JWT, bcrypt), correo, utilidades de BD
+├── frontend/src/
+│   ├── pages/             # LandingPage, LoginPage (login, recuperar, restablecer) y pages/app/*
+│   ├── components/        # layout, landing, auth, crm (formularios), ui (piezas comunes)
+│   ├── services/          # llamadas a la API
+│   ├── lib/               # formato (COP, fechas), roles, useCarga
+│   └── index.css          # paleta y temas claro/oscuro
+├── despliegue/            # Dockerfiles de producción para Railway
+├── docs/                  # guía, manual, guion, despliegue, informe final
+└── docker-compose.yml     # db, backend, frontend y mailpit
 ```
+
+El recorrido de una petición y la explicación de cada módulo están en [docs/GUIA_PROYECTO.md](docs/GUIA_PROYECTO.md).
 
 ---
 
-## ⚡ Guía de Despliegue y Ejecución
+## Correos
 
-### Variables de entorno
+| Cuándo | A quién |
+| --- | --- |
+| Un visitante se registra desde el sitio | Bienvenida al visitante |
+| Se activa una prueba (sitio público o desde el CRM) | Datos de la prueba: producto, inicio y fin |
+| "¿Olvidaste tu contraseña?" en `/login` | Enlace para crear una nueva (vence en 30 minutos y sirve una vez) |
+| Se cambia o restablece una contraseña | Aviso de seguridad al dueño de la cuenta |
 
-Crea los archivos de entorno antes del arranque:
-
-```bash
-cp .env.example .env
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-```
-
-- `.env`: configuración usada por Docker Compose para el backend dentro de la red de contenedores.
-- `backend/.env`: configuración para ejecutar el backend localmente; usa `DB_HOST=localhost` y `DB_PORT=3307`.
-- `frontend/.env`: URL pública de la API.
-
-Para Docker, el `.env` de la raíz ya configura `DB_HOST=db` y `DB_PORT=3306`. No debe apuntar a `localhost`, porque el backend se ejecuta dentro de su propio contenedor.
-
-### 1. Levantar la Base de Datos con Docker Compose
-
-En la raíz del proyecto:
-
-```bash
-docker compose up -d
-```
-
-- **Contenedor:** `zimbra_mysql` (MySQL 8.0).
-- **Puerto expuesto en el host:** **`3307`** (para evitar colisiones con instancias locales en `3306`).
-- **Base de datos:** `crm_zimbra`.
-- **Usuario:** `root` | **Contraseña:** *(sin contraseña)*.
-- **Frontend en Docker Compose:** [http://localhost:5174](http://localhost:5174) (el contenedor escucha en el puerto `5173`).
-
-Verificar estado del contenedor:
-```bash
-docker compose ps
-```
-
----
-
-### 2. Iniciar el Backend (FastAPI)
-
-En una terminal:
-
-```bash
-cd backend
-
-# 1. Crear y activar el entorno virtual
-python3 -m venv .venv
-source .venv/bin/activate  # En Windows: .venv\Scripts\activate
-
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Iniciar el servidor
-uvicorn app.main:app --reload --port 8000
-```
-
-- **Documentación Swagger interactiva:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Healthcheck:** [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
-
----
-
-### 3. Iniciar el Frontend (React + Vite + TypeScript)
-
-En otra terminal:
-
-```bash
-cd frontend
-
-# 1. Instalar dependencias
-npm install
-
-# 2. Iniciar servidor de desarrollo
-npm run dev
-```
-
-- **Aplicación web:** [http://localhost:5173](http://localhost:5173)
-
----
-
-## 🔐 Credenciales del Administrador de Prueba
-
-El usuario administrador se encuentra creado directamente en la base de datos MySQL:
-
-| Campo | Valor |
-| :--- | :--- |
-| **Correo Electrónico** | `camila.rojas1@zimbra-demo.com` |
-| **Contraseña** | `Zimbra2026*` |
-| **Rol** | `Admin` |
-
----
-
-## 🎯 Cobertura de la Épica EP-01 · Autenticación y Usuarios
-
-- **HU-01 — Iniciar sesión (RF-01):** Hashing seguro con `bcrypt`, generación de JWT y mensajes genéricos de error. Rechazo de empleados inactivos.
-- **HU-02 — Cerrar sesión y expiración (RF-02):** Botón visible en el `Navbar`. Detector de inactividad que expira la sesión a los 30 minutos continuos sin eventos del usuario y redirige al login.
-- **HU-03 — Gestionar empleados (RF-03):** Módulo exclusivo para `Admin`. Creación, edición, listado con filtros y soft delete (`activo = FALSE`). **Regla crítica:** El sistema bloquea con HTTP 400 cualquier intento de desactivar o cambiar el rol del último Administrador activo.
-- **HU-04 — Control de acceso por rol (RF-04, RN-12):** Menú lateral dinámico según rol, rechazo de accesos no autorizados con **HTTP 403 Forbidden**. El rol `Vendedor` únicamente ve sus prospectos asignados (`empleado_id`), mientras que `Marketing` y `Admin` tienen visibilidad global.
+En local todos llegan a Mailpit (http://localhost:8025); nadie recibe correos reales. Los correos salen en segundo plano: si el envío falla, la operación ya quedó guardada en la base. Configuración en `backend/app/core/correo.py` y en las variables `CORREO_*` de `.env.example`.
 
 ---
 
 ## Pruebas
 
 ```bash
-cd backend && pip install -r requirements-dev.txt && pytest -v     # API (HU-43/44)
-docker compose exec backend python scripts/probar_api.py          # recorrido completo
+docker compose exec backend python scripts/probar_api.py             # recorrido completo
+docker compose exec backend python scripts/simular_concurrencia.py   # ventas y visitas simultáneas
+cd backend && pip install -r requirements-dev.txt && pytest -v      # pruebas automáticas
 ```
-SQL: `DB/pruebas/08` (ACID), `09` (carga 10 000), `10` (EXPLAIN), `11` (concurrencia, 2 terminales), `12` (permisos).
-Concurrencia contra la API: `docker compose exec backend python scripts/simular_concurrencia.py`.
-Respaldo: `.\DBespaldoespaldo.ps1` y `restaurar.ps1` (o los `.sh`).
 
-## Documentación del Proyecto
+SQL en `DB/pruebas/`: `08` (ACID), `09` (carga de 10 000 prospectos), `10` (EXPLAIN), `11` (concurrencia en dos terminales), `12` (permisos). Respaldo: `.\DB\respaldo\respaldo.ps1` y `restaurar.ps1`.
 
-- [Requerimientos funcionales y reglas de negocio](REQUIREMENTS.md)
-- [Backlog priorizado de la siguiente entrega](BACKLOG.md)
-- [Manual de usuario](docs/MANUAL_USUARIO.md) · [Guion de demostración](docs/GUION_DEMOSTRACION.md) · [Alineación con el informe](docs/ALINEACION_ENTREGAS.md)
-- Sesión 4: [Informe final en inglés (APA)](docs/Final_Report_Zimbra_CRM.docx) · [Sustentación oral de 13 min](docs/ORAL_PRESENTATION_13MIN.md)
-- [Datos listos para probar](docs/DATOS_DEMO.md)
+---
+
+## Despliegue
+
+Paso a paso para publicar el sistema en Railway: [docs/DESPLIEGUE_RAILWAY.md](docs/DESPLIEGUE_RAILWAY.md).
+
+## Documentación
+
+- [Requerimientos](REQUIREMENTS.md) · [Backlog](BACKLOG.md)
+- [Guía del proyecto](docs/GUIA_PROYECTO.md) · [Manual de usuario](docs/MANUAL_USUARIO.md) · [Datos demo](docs/DATOS_DEMO.md)
+- [Guion de demostración](docs/GUION_DEMOSTRACION.md) · [Sustentación oral](docs/ORAL_PRESENTATION_13MIN.md) · [Alineación con el informe](docs/ALINEACION_ENTREGAS.md)
+- [Informe final (APA)](docs/Final_Report_Zimbra_CRM.docx)

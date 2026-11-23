@@ -78,7 +78,9 @@ export const LandingPage: React.FC = () => (
             </a>
           </div>
         </div>
-        <HeroInbox />
+        <div className="hero-visual">
+          <HeroInbox />
+        </div>
       </section>
 
       <section id="producto" className="band">
@@ -113,7 +115,7 @@ export const LandingPage: React.FC = () => (
       <section id="planes" className="band">
         <div className="band-inner">
           <h2>Planes comerciales</h2>
-          <p className="band-lead">Pagas por licencia. Empieza con la prueba gratis y elige después.</p>
+          <p className="band-lead">Precios en pesos colombianos por usuario al mes. Empieza con la prueba gratis y elige después.</p>
           <PlanesSection />
         </div>
       </section>

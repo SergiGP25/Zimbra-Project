@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 # dias_restantes NO se guarda: cambia cada día, se calcula al consultar
 _SELECT = """
-    SELECT d.descarga_id, d.prospecto_id, p.nombre AS prospecto, p.empresa, d.producto_id,
+    SELECT d.descarga_id, d.prospecto_id, p.nombre AS prospecto, p.empresa, p.email AS prospecto_email, d.producto_id,
            pr.nombre AS producto, d.fecha_inicio, d.fecha_fin, d.estado,
            DATEDIFF(d.fecha_fin, CURRENT_DATE) AS dias_restantes,
            p.empleado_id, e.nombre AS vendedor

@@ -18,5 +18,7 @@ COPY . .
 EXPOSE 8000
 
 # Run the FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Railway (y otros servicios en la nube) indican el puerto en la variable PORT;
+# en local no existe y se usa 8000.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 

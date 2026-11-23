@@ -1,10 +1,11 @@
 from typing import Dict, Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, require_roles
 from app.core.database import get_db
 from app.schemas.pruebas.prueba_schema import PruebaCreate
+from app.services.notificaciones import notificacion_service
 from app.services.pruebas.prueba_service import prueba_service
 
 router = APIRouter()
@@ -22,9 +23,15 @@ def listar(
 
 
 @router.post("/", status_code=201, summary="Registrar descarga de prueba (RF-17, transacción T1)")
-def registrar(datos: PruebaCreate, usuario: Dict = Depends(require_roles(["Admin", "Marketing", "Vendedor"])),
+def registrar(datos: PruebaCreate, tareas: BackgroundTasks,
+              usuario: Dict = Depends(require_roles(["Admin", "Marketing", "Vendedor"])),
               db: Optional[Session] = Depends(get_db)):
-    return prueba_service.registrar(datos.prospecto_id, datos.producto_id, usuario, db)
+    prueba = prueba_service.registrar(datos.prospecto_id, datos.producto_id, usuario, db)
+    # El correo sale DESPUÉS de responder: si falla, la prueba ya quedó guardada
+    if prueba and prueba.get("prospecto_email"):
+        tareas.add_task(notificacion_service.prueba_activada, prueba["prospecto_email"], prueba["prospecto"],
+                        prueba["producto"], prueba["fecha_inicio"], prueba["fecha_fin"])
+    return prueba
 
 
 @router.post("/vencer", summary="Vencer pruebas y avisar las que vencen pronto (RF-19, RF-26)")

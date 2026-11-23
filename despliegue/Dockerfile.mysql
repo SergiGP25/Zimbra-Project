@@ -1,0 +1,29 @@
+# MySQL para Railway con los scripts del proyecto ya cargados.
+# Al arrancar por primera vez (volumen vacío), la imagen oficial ejecuta en
+# orden alfabético todo lo que hay en /docker-entrypoint-initdb.d.
+#
+# Se copia script por script a propósito:
+#   - NO va 04_create_admin_user.sql: crea el usuario admin/admin con todos
+#     los permisos, aceptable en un taller local pero no en internet.
+#   - NO van DB/pruebas ni DB/herramientas: no son parte de la base.
+FROM mysql:8.0
+
+COPY DB/01_crear_tablas.sql \
+     DB/02_insertar_datos.sql \
+     DB/03_verificacion.sql \
+     DB/05_triggers.sql \
+     DB/06_transacciones.sql \
+     DB/07_reportes.sql \
+     DB/08_vistas.sql \
+     DB/09_indices.sql \
+     DB/10_roles_permisos.sql \
+     DB/11_datos_demo.sql \
+     DB/12_evento_vencimiento.sql \
+     /docker-entrypoint-initdb.d/
+
+# Las mismas opciones que docker-compose.yml: tildes correctas, hora de Colombia
+CMD ["mysqld", \
+     "--character-set-server=utf8mb4", \
+     "--collation-server=utf8mb4_0900_ai_ci", \
+     "--default-time-zone=-05:00", \
+     "--default-authentication-plugin=mysql_native_password"]

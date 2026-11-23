@@ -4,8 +4,6 @@
 
 ```bash
 cp .env.example .env
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
 docker compose up -d --build
 ```
 
@@ -15,6 +13,7 @@ docker compose up -d --build
 | API (Swagger) | http://localhost:8000/docs |
 | Salud de la API | http://localhost:8000/api/v1/health |
 | MySQL | localhost:3307, usuario `root`, sin contraseña |
+| Correos enviados (Mailpit) | http://localhost:8025 |
 
 Sin Docker: ver el README (MySQL en Docker, backend con `uvicorn`, frontend con `npm run dev`).
 
@@ -32,7 +31,7 @@ La sesión se cierra tras 30 minutos sin actividad.
 
 ## 3. Flujo de uso (paso a paso)
 
-1. **Iniciar sesión** con el correo y la contraseña. Un dato errado muestra «Correo o contraseña incorrectos».
+1. **Iniciar sesión** con el correo y la contraseña. Un dato errado muestra «Correo o contraseña incorrectos». Si la olvidaste, **¿Olvidaste tu contraseña?** envía un enlace al correo de la cuenta (en local se ve en http://localhost:8025).
 2. **Prospectos → Nuevo prospecto.** Nombre, correo (único), empresa, teléfono y campaña de origen.
 3. **Pruebas gratuitas → Registrar descarga.** Elige un producto de versión Gratuita. Suma 20 puntos y el prospecto pasa a *En prueba*; la prueba dura 60 días calculados por la base de datos.
 4. **Visitas web → Simular visita.** Cada visita suma 5 puntos (+15 si es `/precios`). Al llegar a 50 puntos el prospecto es *Calificado*. Si ya está calificado y tiene vendedor, se crea una alerta (máximo una por hora).

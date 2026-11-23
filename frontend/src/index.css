@@ -6,49 +6,64 @@
   vuelve a pintar todo con los valores del otro bloque. No hay que tocar
   ningún componente.
 
-  Paleta: tinta azul de correo, papel frío y un verde azulado de "sello"
-  como acento. El mostaza solo marca lo "no leído" o pendiente.
+  Paleta base (seis colores):
+    #1A1A1F noche    #2D2B55 índigo    #6A5ACD violeta
+    #A678B9 orquídea #F0D9B5 crema     #F4A62A ámbar
+  Claro: papel crema, tinta noche, violeta para acciones, ámbar para lo pendiente.
+  Oscuro: fondo noche con superficies índigo, ámbar para acciones y lavanda
+  (violeta aclarado) para lo pendiente. Los pares texto/fondo cumplen
+  contraste WCAG AA (4.5:1 o más).
 */
 :root,
 [data-theme='light'] {
-  --paper: #f3f6f7;          /* fondo general */
+  --paper: #faf6ef;          /* fondo general (crema muy claro) */
   --surface: #ffffff;        /* tarjetas, paneles */
-  --surface-sunken: #e9eef1; /* filtros, encabezados de tabla */
-  --ink: #142235;            /* texto principal */
-  --ink-soft: #4d5e72;       /* texto secundario */
-  --line: #d3dde4;           /* bordes */
-  --accent: #0f766e;         /* botones, enlaces, foco */
-  --accent-strong: #0b5d56;  /* hover del acento */
-  --accent-wash: #dcefec;    /* fondo suave del acento */
+  --surface-sunken: #f3ecdf; /* filtros, encabezados de tabla */
+  --ink: #1a1a1f;            /* texto principal */
+  --ink-soft: #55506b;       /* texto secundario */
+  --line: #e4dacb;           /* bordes */
+  --accent: #6a5acd;         /* botones, enlaces, foco */
+  --accent-strong: #2d2b55;  /* hover del acento */
+  --accent-wash: #ece9fb;    /* fondo suave del acento */
   --on-accent: #ffffff;      /* texto sobre el acento */
-  --flag: #e3a21a;           /* no leído / pendiente */
+  --flag: #f4a62a;           /* no leído / pendiente */
+  --brand-deep: #2d2b55;     /* franjas de marca */
+  --brand-orchid: #a678b9;   /* detalles decorativos */
+  --brand-cream: #f0d9b5;
+  --glow-a: rgba(106, 90, 205, 0.16);
+  --glow-b: rgba(244, 166, 42, 0.14);
   --danger: #b42318;
   --danger-wash: #fde8e6;
   --success: #12704a;
   --success-wash: #dff3ea;
   --warning-wash: #fdf1d6;
-  --shadow: 0 1px 2px rgba(20, 34, 53, 0.06), 0 8px 24px rgba(20, 34, 53, 0.08);
+  --shadow: 0 1px 2px rgba(45, 43, 85, 0.06), 0 8px 24px rgba(45, 43, 85, 0.09);
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --paper: #0f1a28;
-  --surface: #172537;
-  --surface-sunken: #122030;
-  --ink: #e6edf2;
-  --ink-soft: #9aabbd;
-  --line: #2a3b50;
-  --accent: #3cc4ae;
-  --accent-strong: #63d6c3;
-  --accent-wash: #173a3c;
-  --on-accent: #08201d;
-  --flag: #f2b33d;
+  --paper: #1a1a1f;
+  --surface: #23223a;
+  --surface-sunken: #1e1d2c;
+  --ink: #f2ece3;
+  --ink-soft: #b9b2cc;
+  --line: #38365e;
+  --accent: #f4a62a;
+  --accent-strong: #f7bd5e;
+  --accent-wash: #3a2f1f;
+  --on-accent: #1a1a1f;
+  --flag: #a99cf0;
+  --brand-deep: #2d2b55;
+  --brand-orchid: #a678b9;
+  --brand-cream: #f0d9b5;
+  --glow-a: rgba(106, 90, 205, 0.32);
+  --glow-b: rgba(244, 166, 42, 0.18);
   --danger: #ff8a7a;
   --danger-wash: #3a1f22;
   --success: #5fd49c;
   --success-wash: #173326;
   --warning-wash: #3a2f15;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 

@@ -1,9 +1,10 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.publico.publico_schema import ProductoGratuito, PruebaRegistrada, SolicitudPrueba
+from app.services.notificaciones import notificacion_service
 from app.services.publico.publico_service import publico_service
 
 # Rutas PÚBLICAS: no usan get_current_user, cualquier visitante las puede llamar.
@@ -35,5 +36,12 @@ def listar_planes(db: Optional[Session] = Depends(get_db)):
         "sp_registrar_descarga: prueba Activa de 60 días, estado En prueba y +20 puntos."
     ),
 )
-def registrar_prueba_gratis(datos: SolicitudPrueba, db: Optional[Session] = Depends(get_db)):
-    return publico_service.registrar_prueba(datos, db)
+def registrar_prueba_gratis(datos: SolicitudPrueba, tareas: BackgroundTasks, db: Optional[Session] = Depends(get_db)):
+    resultado = publico_service.registrar_prueba(datos, db)
+    # Correos en segundo plano: primero la bienvenida (solo si es un registro
+    # nuevo) y luego los datos de la prueba activada.
+    if resultado.prospecto_nuevo:
+        tareas.add_task(notificacion_service.registro_recibido, datos.email, datos.nombre)
+    tareas.add_task(notificacion_service.prueba_activada, datos.email, datos.nombre,
+                    resultado.producto, resultado.fecha_inicio, resultado.fecha_fin)
+    return resultado

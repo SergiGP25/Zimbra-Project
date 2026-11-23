@@ -4,7 +4,7 @@ import { Enlace } from '../../router/router'
 import { useCarga } from '../../lib/useCarga'
 import { formatoFechaHora } from '../../lib/formato'
 import { alertaService } from '../../services/crm/crmService'
-import { Cargando, Encabezado, ErrorCarga, Estado, Vacio } from '../../components/ui/ui'
+import { Cargando, Encabezado, ErrorCarga, Estado, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 
 /*
   RF-27 y RF-28: bandeja de alertas. Las crean la transacción T2 (un
@@ -15,6 +15,7 @@ export const AlertasPage: React.FC<{ params: Record<string, string> }> = () => {
   const { user } = useAuth()
   const [soloPendientes, setSoloPendientes] = useState(true)
   const { datos, cargando, error, recargar, setDatos } = useCarga(() => alertaService.listar(soloPendientes), [soloPendientes])
+  const pag = usePaginacion(datos)
 
   const atender = async (id: number) => {
     await alertaService.atender(id)
@@ -34,7 +35,7 @@ export const AlertasPage: React.FC<{ params: Record<string, string> }> = () => {
         <Vacio texto={soloPendientes ? 'No tienes alertas pendientes.' : 'No hay alertas.'} />
       ) : (
         <ul className="alert-list">
-          {datos?.map((a) => (
+          {pag.visibles.map((a) => (
             <li key={a.alerta_id} className={`alert-item${a.atendida ? ' is-done' : ''}`}>
               <span className={`alert-dot ${a.motivo === 'Prueba por vencer' ? 'dot-warning' : 'dot-flag'}`} aria-hidden="true" />
               <div className="alert-body">
@@ -54,6 +55,7 @@ export const AlertasPage: React.FC<{ params: Record<string, string> }> = () => {
           ))}
         </ul>
       )}
+      <Paginacion estado={pag} nombre="alertas" />
     </div>
   )
 }

@@ -179,7 +179,7 @@ export const FormVenta: React.FC<Omit<Props, 'prospectoId'> & { propuestaId?: nu
               <option>Transferencia</option><option>Tarjeta</option><option>Factura</option><option>Efectivo</option>
             </select></div>
           <div className="form-group"><label htmlFor="v-monto">Monto final <span className="optional">(opcional)</span></label>
-            <input id="v-monto" type="number" min={0} step="0.01" className="input" value={monto} onChange={(e) => setMonto(e.target.value)}
+            <input id="v-monto" type="number" min={0} step="1" className="input" value={monto} onChange={(e) => setMonto(e.target.value)}
               placeholder={elegida ? String(elegida.valor_total) : ''} /></div>
         </div>
         <p className="field-help">Vacío = valor de la propuesta. Puede ser menor si hubo descuento, nunca mayor.

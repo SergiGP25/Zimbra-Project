@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCarga } from '../../lib/useCarga'
 import { prospectoService } from '../../services/crm/crmService'
 
@@ -102,3 +102,41 @@ export const Indicador: React.FC<{ etiqueta: string; valor: React.ReactNode; det
     {detalle && <span className="kpi-detalle">{detalle}</span>}
   </div>
 )
+
+/*
+  Paginación en el navegador (RNF-04: 20 registros por página por defecto).
+  usePaginacion recibe la lista completa y devuelve solo la página visible.
+  Si un filtro deja menos páginas, la página actual se ajusta sola.
+*/
+export interface EstadoPaginacion {
+  pagina: number
+  totalPaginas: number
+  total: number
+  porPagina: number
+  setPagina: (n: number) => void
+}
+
+export function usePaginacion<T>(lista: T[] | null | undefined, porPagina = 20): EstadoPaginacion & { visibles: T[] } {
+  const [pagina, setPagina] = useState(1)
+  const total = lista?.length ?? 0
+  const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
+  const actual = Math.min(pagina, totalPaginas)
+  const visibles = (lista || []).slice((actual - 1) * porPagina, actual * porPagina)
+  return { pagina: actual, totalPaginas, total, porPagina, setPagina, visibles }
+}
+
+/** Controles Anterior / Siguiente. No se muestra si todo cabe en una página. */
+export const Paginacion: React.FC<{ estado: EstadoPaginacion; nombre: string }> = ({ estado, nombre }) => {
+  if (estado.total <= estado.porPagina) return null
+  return (
+    <div className="pagination">
+      <span className="text-muted">{estado.total} {nombre}, página {estado.pagina} de {estado.totalPaginas}</span>
+      <div>
+        <button type="button" className="btn btn-secondary btn-sm" disabled={estado.pagina <= 1}
+          onClick={() => estado.setPagina(estado.pagina - 1)}>Anterior</button>
+        <button type="button" className="btn btn-secondary btn-sm" disabled={estado.pagina >= estado.totalPaginas}
+          onClick={() => estado.setPagina(estado.pagina + 1)}>Siguiente</button>
+      </div>
+    </div>
+  )
+}

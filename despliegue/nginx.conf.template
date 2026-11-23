@@ -1,0 +1,19 @@
+server {
+    listen ${PORT};
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # El enrutador de la app vive en el navegador: /login, /app/ventas...
+    # no son archivos. Si no existe el archivo pedido, se entrega index.html
+    # y React decide qué pantalla mostrar.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Los archivos de /assets llevan un código en el nombre y cambian en cada
+    # compilación: el navegador los puede guardar mucho tiempo.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}

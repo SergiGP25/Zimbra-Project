@@ -29,7 +29,7 @@ Todos los correos terminan en `@demo-sesion4.com`.
 | 2 alertas pendientes del vendedor 6 (en `concurrencia1` y `2`) | Bandeja de alertas, marcar como atendida |
 | `demo.alerta1`: Calificado, 70 puntos, sin alertas | T2: simular visita a `/precios` → se crea la alerta; una segunda visita en la hora no repite |
 | `demo.vence1`: prueba que vence en 5 días | "Pruebas por vencer" del panel |
-| `demo.vence2`: prueba que terminó ayer pero sigue Activa | Botón "Vencer pruebas" / `sp_vencer_pruebas` (SAVEPOINT) |
+| `demo.vence2`: prueba que terminó ayer pero sigue Activa | Botón "Vencer pruebas" / `sp_vencer_pruebas` (SAVEPOINT). El evento `ev_vencer_pruebas` (DB/12) lo hace solo cada noche a las 00:05: para mostrarlo a mano, monta la base el mismo día de la demo |
 | `demo.nuevo1`, `demo.nuevo2` (vendedor 6) | T1: registrar descarga de prueba |
 | `demo.sinvendedor` | T5: asignar / reasignar vendedor |
 

@@ -5,7 +5,7 @@ import { formatoMoneda } from '../../lib/formato'
 import { puede } from '../../lib/roles'
 import { productoService } from '../../services/crm/crmService'
 import { Producto } from '../../types/crm/crmTypes'
-import { Aviso, Cargando, Encabezado, ErrorCarga, Modal, Vacio } from '../../components/ui/ui'
+import { Aviso, Cargando, Encabezado, ErrorCarga, Modal, Vacio, Paginacion, usePaginacion } from '../../components/ui/ui'
 
 /* RF-14 a RF-16: catálogo. Los productos no se borran: se desactivan (RN-13). */
 export const ProductosPage: React.FC<{ params: Record<string, string> }> = () => {
@@ -15,6 +15,7 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
   const [editando, setEditando] = useState<Producto | 'nuevo' | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
   const { datos, cargando, error, recargar } = useCarga(() => productoService.listar({ version }), [version])
+  const pag = usePaginacion(datos?.productos)
 
   const alternar = async (p: Producto) => {
     await productoService.cambiarActivo(p.producto_id, !p.activo)
@@ -41,7 +42,7 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
           <table className="data-table">
             <thead><tr><th>Producto</th><th>Versión</th><th className="num">Precio por licencia</th><th className="num">Pruebas</th><th className="num">Propuestas</th><th>Estado</th>{admin && <th><span className="sr-only">Acciones</span></th>}</tr></thead>
             <tbody>
-              {datos?.productos.map((p) => (
+              {pag.visibles.map((p) => (
                 <tr key={p.producto_id} className={p.activo ? '' : 'row-inactive'}>
                   <td className="cell-title">{p.nombre}</td>
                   <td>{p.version}</td>
@@ -61,6 +62,7 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
           </table>
         </div>
       )}
+      <Paginacion estado={pag} nombre="productos" />
       {editando && <FormProducto producto={editando === 'nuevo' ? undefined : editando} onClose={() => setEditando(null)}
         onGuardado={(m) => { setEditando(null); setAviso(m); recargar() }} />}
     </div>
@@ -70,7 +72,7 @@ export const ProductosPage: React.FC<{ params: Record<string, string> }> = () =>
 const FormProducto: React.FC<{ producto?: Producto; onClose: () => void; onGuardado: (m: string) => void }> = ({ producto, onClose, onGuardado }) => {
   const [nombre, setNombre] = useState(producto?.nombre || '')
   const [version, setVersion] = useState<'Gratuita' | 'Comercial'>(producto?.version || 'Comercial')
-  const [precio, setPrecio] = useState(producto ? Number(producto.precio_unitario) : 10)
+  const [precio, setPrecio] = useState(producto ? Number(producto.precio_unitario) : 50000)
   const [error, setError] = useState<string | null>(null)
 
   const enviar = async (e: React.FormEvent) => {
@@ -97,8 +99,8 @@ const FormProducto: React.FC<{ producto?: Producto; onClose: () => void; onGuard
             <select id="pr-version" className="input" value={version} disabled={!!producto} onChange={(e) => setVersion(e.target.value as 'Gratuita' | 'Comercial')}>
               <option>Comercial</option><option>Gratuita</option>
             </select></div>
-          <div className="form-group"><label htmlFor="pr-precio">Precio por licencia (USD)</label>
-            <input id="pr-precio" type="number" min={0.01} step="0.01" className="input" value={version === 'Gratuita' ? 0 : precio}
+          <div className="form-group"><label htmlFor="pr-precio">Precio por licencia (COP)</label>
+            <input id="pr-precio" type="number" min={1} step="1" className="input" value={version === 'Gratuita' ? 0 : precio}
               disabled={version === 'Gratuita'} onChange={(e) => setPrecio(Number(e.target.value))} /></div>
         </div>
         {producto && <p className="field-help">La versión no se cambia: un producto con pruebas o propuestas cambiaría su significado.</p>}
