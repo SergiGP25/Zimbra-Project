@@ -94,7 +94,47 @@ export const TrialSection: React.FC = () => {
   }
 
   return (
-    <form className="trial-form" onSubmit={handleSubmit}>
+    /* Dos columnas: tus datos a la izquierda y el servicio a la derecha.
+       En celular el servicio pasa arriba (ver .trial-grid en landing.css). */
+    <form className="trial-form trial-grid" onSubmit={handleSubmit}>
+      <div className="trial-datos">
+        <h3>Tus datos</h3>
+        <div className="form-group">
+          <label htmlFor="trial-nombre">Nombre completo</label>
+          <input id="trial-nombre" name="nombre" className="input" value={form.nombre} onChange={actualizar} required minLength={2} autoComplete="name" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="trial-email">Correo de trabajo</label>
+          <input id="trial-email" name="email" type="email" className="input" value={form.email} onChange={actualizar} required autoComplete="email" />
+          <span className="field-help">Ahí te llega el enlace a tu página «Mi prueba».</span>
+        </div>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="trial-empresa">Empresa <span className="optional">(opcional)</span></label>
+            <input id="trial-empresa" name="empresa" className="input" value={form.empresa} onChange={actualizar} autoComplete="organization" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="trial-telefono">Teléfono <span className="optional">(opcional)</span></label>
+            <input id="trial-telefono" name="telefono" type="tel" className="input" value={form.telefono} onChange={actualizar} autoComplete="tel" />
+          </div>
+        </div>
+
+        {productoElegido && (
+          <p className="trial-resumen">Vas a probar <strong>{productoElegido.nombre}</strong> durante 60 días.</p>
+        )}
+
+        {error && (
+          <div className="alert alert-error" role="alert">
+            {error}
+          </div>
+        )}
+
+        <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={enviando || !productoElegido}>
+          {enviando ? 'Activando tu prueba…' : 'Activar prueba de 60 días'}
+        </button>
+        <p className="form-note">Sin tarjeta de crédito. Al terminar los 60 días decides si continúas.</p>
+      </div>
+
       <fieldset className="product-picker">
         <legend>¿Qué quieres probar?</legend>
         <p className="picker-help">Cada opción es una parte de Zimbra. Elige una; después puedes probar otras con el mismo correo.</p>
@@ -123,36 +163,6 @@ export const TrialSection: React.FC = () => {
           ))}
         </div>
       </fieldset>
-
-      <div className="form-grid">
-        <div className="form-group">
-          <label htmlFor="trial-nombre">Nombre completo</label>
-          <input id="trial-nombre" name="nombre" className="input" value={form.nombre} onChange={actualizar} required minLength={2} autoComplete="name" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="trial-email">Correo de trabajo</label>
-          <input id="trial-email" name="email" type="email" className="input" value={form.email} onChange={actualizar} required autoComplete="email" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="trial-empresa">Empresa <span className="optional">(opcional)</span></label>
-          <input id="trial-empresa" name="empresa" className="input" value={form.empresa} onChange={actualizar} autoComplete="organization" />
-        </div>
-        <div className="form-group">
-          <label htmlFor="trial-telefono">Teléfono <span className="optional">(opcional)</span></label>
-          <input id="trial-telefono" name="telefono" type="tel" className="input" value={form.telefono} onChange={actualizar} autoComplete="tel" />
-        </div>
-      </div>
-
-      {error && (
-        <div className="alert alert-error" role="alert">
-          {error}
-        </div>
-      )}
-
-      <button type="submit" className="btn btn-primary btn-lg" disabled={enviando || !productoElegido}>
-        {enviando ? 'Activando tu prueba…' : 'Activar prueba de 60 días'}
-      </button>
-      <p className="form-note">Sin tarjeta de crédito. Al terminar los 60 días decides si continúas.</p>
     </form>
   )
 }

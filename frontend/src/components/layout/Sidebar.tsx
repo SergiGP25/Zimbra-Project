@@ -5,6 +5,7 @@ import { useCarga } from '../../lib/useCarga'
 import { alertaService } from '../../services/crm/crmService'
 import { Icono } from '../ui/Iconos'
 import { ChangePasswordModal } from '../auth/ChangePasswordModal'
+import { Logo } from '../ui/Logo'
 
 /*
   Menú lateral. Cada opción declara qué roles la ven (HU-04).
@@ -60,11 +61,7 @@ export const Sidebar: React.FC<{ rutaActual: string }> = ({ rutaActual }) => {
   return (
     <aside className="sidebar">
       <Enlace to="/app" className="sidebar-brand" aria-label="Zimbra CRM, ir al panel">
-        <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
-          <rect x="1" y="1" width="30" height="22" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="M3 4l13 10L29 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        </svg>
-        <span>Zimbra CRM</span>
+        <Logo tamano={34} className="logo-claro" />
       </Enlace>
 
       <nav aria-label="Módulos" className="sidebar-nav-scroll">

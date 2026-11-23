@@ -2,6 +2,7 @@ import React from 'react'
 import { useAuth } from '../../hooks/auth/useAuth'
 import { Enlace } from '../../router/router'
 import { ThemeToggle } from '../theme/ThemeToggle'
+import { Logo } from '../ui/Logo'
 
 /*
   Encabezado del sitio público.
@@ -17,11 +18,7 @@ export const PublicHeader: React.FC = () => {
     <header className="site-header">
       <div className="site-header-inner">
         <a href="#inicio" className="wordmark" aria-label="Zimbra, ir al inicio">
-          <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
-            <rect x="1" y="1" width="30" height="22" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
-            <path d="M3 4l13 10L29 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-          </svg>
-          <span>zimbra</span>
+          <Logo tamano={34} />
         </a>
 
         <nav className="site-nav" aria-label="Secciones">

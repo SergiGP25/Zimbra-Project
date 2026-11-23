@@ -6,6 +6,7 @@ import { Enlace } from '../router/router'
 import { formatoFecha } from '../lib/formato'
 import { Estado } from '../components/ui/ui'
 import '../styles/landing.css'
+import { Logo } from '../components/ui/Logo'
 
 /*
   "Mi prueba": así entra el visitante que activó una prueba gratis.
@@ -53,11 +54,7 @@ export const MiPruebaPage: React.FC = () => {
       <header className="site-header">
         <div className="site-header-inner">
           <Enlace to="/" className="wordmark" aria-label="Zimbra, ir al inicio">
-            <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
-              <rect x="1" y="1" width="30" height="22" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
-              <path d="M3 4l13 10L29 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-            <span>zimbra</span>
+            <Logo tamano={34} />
           </Enlace>
           <div className="site-actions">
             <ThemeToggle />

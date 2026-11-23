@@ -4,6 +4,7 @@ import { LoginForm } from '../components/auth/LoginForm'
 import { RecuperarForm, RestablecerForm } from '../components/auth/RecuperarPassword'
 import { ThemeToggle } from '../components/theme/ThemeToggle'
 import { Enlace } from '../router/router'
+import { Logo } from '../components/ui/Logo'
 
 /*
   Página de inicio de sesión (/login), separada del sitio público.
@@ -16,11 +17,7 @@ export const LoginPage: React.FC<{ vista?: 'login' | 'recuperar' | 'restablecer'
   <div className="login-page">
     <aside className="login-aside">
       <Enlace to="/" className="wordmark wordmark-light" aria-label="Volver al inicio">
-        <svg viewBox="0 0 32 24" width="30" height="22" aria-hidden="true">
-          <rect x="1" y="1" width="30" height="22" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="M3 4l13 10L29 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        </svg>
-        <span>zimbra</span>
+        <Logo variante="completo" tamano={44} className="logo-claro" />
       </Enlace>
       <div className="login-aside-body">
         <h1>Tu bandeja comercial, al día.</h1>

@@ -104,7 +104,7 @@ h3 {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-texto, var(--accent));
 }
 
 /* Foco visible para quien navega con teclado (accesibilidad) */

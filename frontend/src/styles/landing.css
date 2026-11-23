@@ -599,3 +599,150 @@
 .portal-pasos { margin: 0 0 1rem; padding-left: 1.25rem; display: grid; gap: 0.4rem; }
 .portal-acciones { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .portal-nota { margin: 0; font-size: 0.85rem; color: var(--ink-soft); }
+
+
+/* =====================================================================
+   SITIO PÚBLICO, LOGIN Y "MI PRUEBA": acento morado y el mismo lenguaje
+   visual del CRM (banda con brillo, tarjetas oscuras, bordes suaves).
+   El ámbar queda solo en el logo y en lo pendiente; las acciones van en violeta.
+   ===================================================================== */
+.landing,
+.login-page {
+  --accent: #6a5acd;            /* violeta: botones y selección */
+  --accent-strong: #5546b8;
+  --accent-wash: #ece9fb;
+  --accent-texto: #5546b8;      /* enlaces sobre fondo claro */
+  --on-accent: #ffffff;
+  --flag: #6a5acd;              /* no leído: violeta en vez de ámbar */
+  --glow-b: rgba(166, 120, 185, 0.2);
+}
+[data-theme='dark'] .landing,
+[data-theme='dark'] .login-page {
+  --accent: #6a5acd;
+  --accent-strong: #8576e6;
+  --accent-wash: rgba(106, 90, 205, 0.2);
+  --accent-texto: #a99cf0;      /* lavanda: se lee bien sobre noche */
+  --on-accent: #ffffff;
+  --flag: #a99cf0;
+  --glow-a: rgba(106, 90, 205, 0.45);
+  --glow-b: rgba(166, 120, 185, 0.3);
+}
+.landing .btn-primary,
+.login-page .btn-primary { box-shadow: 0 8px 24px rgba(106, 90, 205, 0.35); }
+.landing .btn-primary:hover:not(:disabled),
+.login-page .btn-primary:hover:not(:disabled) { background-color: var(--accent-strong); }
+
+/* Logo (components/ui/Logo.tsx) */
+.logo { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--ink); text-decoration: none; }
+.logo-marca { flex-shrink: 0; color: #2d2b55; }
+[data-theme='dark'] .logo-marca, .logo-claro .logo-marca { color: #f0d9b5; }
+.logo-texto { display: flex; flex-direction: column; line-height: 1.05; }
+.logo-nombre { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
+.logo-crm { font-weight: 500; color: var(--accent-texto, var(--accent)); }
+.logo-frase { margin-top: 0.25rem; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.logo-claro .logo-nombre { color: #f2ece3; }
+.logo-claro .logo-crm { color: #c9bde0; }
+.logo-claro .logo-frase { color: #b9b2cc; }
+.wordmark .logo { color: inherit; }
+.wordmark .logo-marca { color: #2d2b55; }
+[data-theme='dark'] .wordmark .logo-marca, .wordmark-light .logo-marca { color: #f0d9b5; }
+.sidebar-brand { padding-left: 0.35rem; }
+
+/* Encabezado: botón principal violeta, fondo con el mismo vidrio */
+.site-header { background-color: color-mix(in srgb, var(--paper) 80%, transparent); }
+
+/* Héroe con la banda de brillo del CRM */
+.landing main > .hero { position: relative; }
+.landing main { position: relative; isolation: isolate; }
+.landing main::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(45% 55% at 85% 20%, var(--glow-a), transparent 70%),
+    radial-gradient(40% 50% at 10% 5%, var(--glow-b), transparent 70%);
+}
+.inbox { border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(26, 26, 31, 0.35); }
+
+/* Secciones: sin rayas entre bandas; el ritmo lo dan las tarjetas */
+.landing .band { border-top: none; }
+.landing .band-inner { padding: 3.5rem 1.5rem; }
+
+/* Lo que incluye: tarjetas con ícono */
+.feature-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+.feature {
+  padding: 1.4rem; border-radius: 16px; border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--kpi-tinte), var(--surface) 65%), var(--surface);
+}
+.feature-icono {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; margin-bottom: 1rem;
+  border-radius: 12px; background-color: var(--accent-wash); color: var(--accent-texto, var(--accent));
+}
+
+/* Cómo funciona: tarjetas con el número en un círculo de degradado */
+.step {
+  padding: 1.4rem; border-top: none; border-radius: 16px; border: 1px solid var(--line); background-color: var(--surface);
+}
+.step::before {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  font-size: 1.3rem; color: #fff; background: linear-gradient(135deg, #6a5acd, #a678b9);
+}
+
+/* Planes */
+.plan { border-radius: 18px; padding: 1.75rem; }
+.plan-featured {
+  border-color: transparent; box-shadow: none;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, #6a5acd, #a678b9) border-box;
+  border: 2px solid transparent;
+}
+.plan-tier { display: inline-block; width: fit-content; padding: 0.2rem 0.6rem; border-radius: 999px; background-color: var(--accent-wash); color: var(--accent-texto, var(--accent)); font-weight: 600; }
+.addons { padding: 1.5rem 1.75rem; border-radius: 18px; border: 1px solid var(--line); background-color: var(--surface); }
+
+/* Prueba gratis: tus datos a la izquierda, el servicio a la derecha */
+.band-trial { background-color: transparent; }
+.trial-intro { max-width: 60ch; margin-bottom: 1.75rem; }
+.trial-intro h2 { margin-bottom: 0.5rem; }
+.trial-intro p { margin: 0; color: var(--ink-soft); font-size: 1.05rem; }
+.trial-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 1.5rem; align-items: start; }
+.trial-datos, .trial-grid .product-picker {
+  padding: 1.6rem; border-radius: 18px; border: 1px solid var(--line); background-color: var(--surface);
+}
+.trial-datos h3 { margin: 0 0 1.1rem; font-size: 1.2rem; }
+.trial-grid .product-picker { margin: 0; }
+.trial-grid .product-picker legend { float: left; width: 100%; margin-bottom: 0.4rem; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; }
+.trial-grid .product-options { grid-template-columns: 1fr; }
+.trial-grid .product-option { padding: 0.8rem 0.95rem; }
+.trial-resumen { margin: 0.25rem 0 1rem; padding: 0.7rem 0.9rem; border-radius: 10px; background-color: var(--accent-wash); font-size: 0.92rem; }
+.trial-done { padding: 1.75rem; border-radius: 18px; border: 1px solid var(--line); background-color: var(--surface); max-width: 640px; }
+
+/* Preguntas frecuentes en tarjeta */
+.faq { padding: 0.5rem 1.5rem; border-radius: 18px; border: 1px solid var(--line); background-color: var(--surface); }
+.faq details:first-child { border-top: none; }
+.faq details:last-child { border-bottom: none; }
+
+/* Login: panel izquierdo con brillos violeta y orquídea (sin naranja) */
+.login-aside {
+  background:
+    radial-gradient(circle at 12% 88%, rgba(166, 120, 185, 0.55), transparent 45%),
+    radial-gradient(circle at 92% 8%, rgba(106, 90, 205, 0.65), transparent 50%),
+    #2d2b55;
+}
+.login-aside-list li::before { background-color: #a99cf0; }
+.login-card { padding: 2.25rem; border-radius: 20px; border: 1px solid var(--line); background-color: var(--surface); box-shadow: var(--shadow); }
+
+@media (max-width: 960px) {
+  .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trial-grid { grid-template-columns: 1fr; }
+  .trial-grid .product-picker { order: -1; } /* en celular primero se elige el servicio */
+}
+@media (max-width: 600px) {
+  .feature-list { grid-template-columns: 1fr; }
+  .login-card { padding: 1.5rem; }
+}
+
+/* Móvil: el logo y los botones del encabezado no se parten en dos líneas */
+.logo-nombre, .site-header .btn { white-space: nowrap; }
+@media (max-width: 480px) {
+  .site-header .logo-nombre { font-size: 1.15rem; }
+  .site-header .btn { padding-inline: 0.8rem; font-size: 0.9rem; }
+}

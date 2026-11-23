@@ -4,6 +4,8 @@ import { PublicHeader } from '../components/landing/PublicHeader'
 import { HeroInbox } from '../components/landing/HeroInbox'
 import { TrialSection } from '../components/landing/TrialSection'
 import { PlanesSection } from '../components/landing/PlanesSection'
+import { Logo } from '../components/ui/Logo'
+import { Icono } from '../components/ui/Iconos'
 
 /*
   Página pública: lo que ve quien NO ha iniciado sesión.
@@ -59,10 +61,10 @@ const PREGUNTAS = [
 ]
 
 const FUNCIONES = [
-  { titulo: 'Correo empresarial', texto: 'Tu dominio, filtros, firmas y búsqueda en todos tus buzones.' },
-  { titulo: 'Calendario y salas', texto: 'Agenda compartida y reserva de salas sin cruzar correos.' },
-  { titulo: 'Contactos y tareas', texto: 'Una libreta de la empresa y listas de pendientes por equipo.' },
-  { titulo: 'Código abierto', texto: 'Lo instalas en tus servidores o en la nube, y tus datos siguen siendo tuyos.' },
+  { titulo: 'Correo empresarial', icono: 'correo', texto: 'Tu dominio, filtros, firmas y búsqueda en todos tus buzones.' },
+  { titulo: 'Calendario y salas', icono: 'calendario', texto: 'Agenda compartida y reserva de salas sin cruzar correos.' },
+  { titulo: 'Contactos y tareas', icono: 'prospectos', texto: 'Una libreta de la empresa y listas de pendientes por equipo.' },
+  { titulo: 'Código abierto', icono: 'codigo', texto: 'Lo instalas en tus servidores o en la nube, y tus datos siguen siendo tuyos.' },
 ]
 
 export const LandingPage: React.FC = () => (
@@ -97,6 +99,7 @@ export const LandingPage: React.FC = () => (
           <dl className="feature-list">
             {FUNCIONES.map((f) => (
               <div key={f.titulo} className="feature">
+                <span className="feature-icono"><Icono nombre={f.icono} tamano={22} /></span>
                 <dt>{f.titulo}</dt>
                 <dd>{f.texto}</dd>
               </div>
@@ -129,7 +132,7 @@ export const LandingPage: React.FC = () => (
       </section>
 
       <section id="prueba" className="band band-trial">
-        <div className="band-inner trial-layout">
+        <div className="band-inner">
           <div className="trial-intro">
             <h2>Activa tu prueba</h2>
             <p>
@@ -159,7 +162,7 @@ export const LandingPage: React.FC = () => (
     <footer className="site-footer">
       <div className="footer-inner">
         <div>
-          <span className="wordmark wordmark-small">zimbra</span>
+          <Logo variante="completo" tamano={36} />
           <p>Correo y colaboración de código abierto.</p>
         </div>
         <nav aria-label="Pie de página" className="footer-links">
